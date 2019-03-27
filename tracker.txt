@@ -1,0 +1,660 @@
+GPU Memory Track | 27-Mar-19-11:50:39 | Total Used Memory:1577.1 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115Total Used Memory:1577.1 Mb
+
+GPU Memory Track | 27-Mar-19-11:51:08 | Total Used Memory:610.0  Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115Total Used Memory:610.0  Mb
+
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120Total Used Memory:1590.8 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140Total Used Memory:1590.8 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154Total Used Memory:1590.8 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 159Total Used Memory:1590.8 Mb
+
+GPU Memory Track | 27-Mar-19-11:51:24 | Total Used Memory:1590.8 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115Total Used Memory:1590.8 Mb
+
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120Total Used Memory:2571.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140Total Used Memory:2571.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154Total Used Memory:2571.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 159Total Used Memory:2571.6 Mb
+
+GPU Memory Track | 27-Mar-19-11:52:58 | Total Used Memory:609.8  Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115Total Used Memory:609.8  Mb
+
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120Total Used Memory:1590.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140Total Used Memory:1590.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154Total Used Memory:1590.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 159Total Used Memory:1590.6 Mb
+
+GPU Memory Track | 27-Mar-19-11:53:13 | Total Used Memory:1590.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115Total Used Memory:1590.6 Mb
+
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120Total Used Memory:2571.4 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140Total Used Memory:2571.4 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154Total Used Memory:2571.4 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 159Total Used Memory:2571.4 Mb
+
+GPU Memory Track | 27-Mar-19-11:56:02 | Total Used Memory:609.8  Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115 Total Used Memory:609.8  Mb
+
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120 Total Used Memory:1590.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140 Total Used Memory:1590.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154 Total Used Memory:1590.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 159 Total Used Memory:1590.6 Mb
+
+GPU Memory Track | 27-Mar-19-11:56:17 | Total Used Memory:1590.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115 Total Used Memory:1590.6 Mb
+
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120 Total Used Memory:2571.4 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140 Total Used Memory:2571.4 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154 Total Used Memory:2571.4 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 159 Total Used Memory:2571.4 Mb
+
+GPU Memory Track | 27-Mar-19-11:59:14 | Total Used Memory:627.8  Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115 Total Used Memory:627.8  Mb
+
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120 Total Used Memory:1608.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140 Total Used Memory:1608.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154 Total Used Memory:1608.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 159 Total Used Memory:1608.6 Mb
+
+GPU Memory Track | 27-Mar-19-11:59:28 | Total Used Memory:1608.6 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115 Total Used Memory:1608.6 Mb
+
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120 Total Used Memory:2589.5 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140 Total Used Memory:2589.5 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154 Total Used Memory:2589.5 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 159 Total Used Memory:2589.5 Mb
+
+GPU Memory Track | 27-Mar-19-12:03:20 | Total Used Memory:637.0  Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115 Total Used Memory:637.0  Mb
+
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120 Total Used Memory:1601.8 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140 Total Used Memory:1601.8 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154 Total Used Memory:1601.8 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 159 Total Used Memory:1601.8 Mb
+
+GPU Memory Track | 27-Mar-19-12:03:35 | Total Used Memory:1588.4 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115 Total Used Memory:1588.4 Mb
+
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120 Total Used Memory:2569.3 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140 Total Used Memory:2569.3 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154 Total Used Memory:2569.3 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 159 Total Used Memory:2569.3 Mb
+
+GPU Memory Track | 27-Mar-19-12:05:12 | Total Used Memory:607.6  Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115 Total Used Memory:607.6  Mb
+
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120 Total Used Memory:1588.4 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140 Total Used Memory:1588.4 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154 Total Used Memory:1588.4 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 159 Total Used Memory:1588.4 Mb
+
+GPU Memory Track | 27-Mar-19-12:05:27 | Total Used Memory:1588.4 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115 Total Used Memory:1588.4 Mb
+
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120 Total Used Memory:2569.3 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140 Total Used Memory:2569.3 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154 Total Used Memory:2569.3 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 159 Total Used Memory:2569.3 Mb
+
+GPU Memory Track | 27-Mar-19-12:06:30 | Total Used Memory:606.9  Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115 Total Used Memory:606.9  Mb
+
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120 Total Used Memory:1587.7 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140 Total Used Memory:1587.7 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154 Total Used Memory:1587.7 Mb
+
+GPU Memory Track | 27-Mar-19-12:06:46 | Total Used Memory:1587.7 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115 Total Used Memory:1587.7 Mb
+
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120 Total Used Memory:2568.5 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140 Total Used Memory:2568.5 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154 Total Used Memory:2568.5 Mb
+
+GPU Memory Track | 27-Mar-19-12:10:21 | Total Used Memory:606.9  Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115 Total Used Memory:606.9  Mb
+
+GPU Memory Track | 27-Mar-19-12:10:37 | Total Used Memory:606.9  Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115 Total Used Memory:606.9  Mb
+
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120 Total Used Memory:1587.7 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140 Total Used Memory:1587.7 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154 Total Used Memory:1587.7 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 162 Total Used Memory:1587.7 Mb
+
+GPU Memory Track | 27-Mar-19-12:10:53 | Total Used Memory:1587.7 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 115 Total Used Memory:1587.7 Mb
+
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(512, 256, 1, 1)     | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(128,)               | Memory: 0.0010 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:()                   | Memory: 4e-06 M | <class 'torch.Tensor'>
++ | 2 * Size:(20, 512, 1, 1)      | Memory: 0.0819 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(256, 256, 3, 3)     | Memory: 4.7185 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000, 4096)         | Memory: 16.384 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 4096)         | Memory: 67.108 M | <class 'torch.nn.parameter.Parameter'>
++ | 6 * Size:(512, 512, 3, 3)     | Memory: 56.623 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 512)           | Memory: 2.0971 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 128, 3, 3)     | Memory: 0.5898 M | <class 'torch.nn.parameter.Parameter'>
++ | 3 * Size:(256,)               | Memory: 0.0030 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(128, 64, 3, 3)      | Memory: 0.2949 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 64, 3, 3)       | Memory: 0.1474 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(64, 3, 3, 3)        | Memory: 0.0069 M | <class 'torch.nn.parameter.Parameter'>
++ | 16 * Size:(512,)               | Memory: 0.0327 M | <class 'torch.Tensor'>
++ | 2 * Size:(64,)                | Memory: 0.0005 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(1000,)              | Memory: 0.004 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(4096, 25088)        | Memory: 411.04 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(512, 128)           | Memory: 0.5242 M | <class 'torch.nn.parameter.Parameter'>
++ | 1 * Size:(256, 128, 3, 3)     | Memory: 1.1796 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(20,)                | Memory: 0.0001 M | <class 'torch.nn.parameter.Parameter'>
++ | 2 * Size:(4096,)              | Memory: 0.0327 M | <class 'torch.nn.parameter.Parameter'>
+
+At Detection.CTPN_vertical.train_pytorch train: line 120 Total Used Memory:2568.5 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 140 Total Used Memory:2568.5 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 154 Total Used Memory:2568.5 Mb
+
+
+At Detection.CTPN_vertical.train_pytorch train: line 162 Total Used Memory:2568.5 Mb
+
