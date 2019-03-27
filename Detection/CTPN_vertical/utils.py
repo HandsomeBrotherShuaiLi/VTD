@@ -58,22 +58,18 @@ def generate_anchors(featuremap_size=(32,16),scale=16,kmeans=False,k=None):
         使用kmeans聚类生成最合适的k个anchor,参考yolo_v3
         """
         pass
-def cal_iou(box1,box1_area,box2,box2_area):
+def cal_iou(box1, box1_area, boxes2, boxes2_area):
     """
-
-    :param box1: [x1,y1,x2,y2]
-    :param box1_area:
-    :param box2: box list
-    :param box2_area:
-    :return:
+    box1 [x1,y1,x2,y2]
+    boxes2 [Msample,x1,y1,x2,y2]
     """
-    x1=np.maximum(box1[0],box2[:,0])
-    x2=np.maximum(box1[2],box2[:,2])
-    y1=np.maximum(box1[1],box2[:,1])
-    y2=np.maximum(box1[3],box2[:,3])
+    x1 = np.maximum(box1[0], boxes2[:, 0])
+    x2 = np.minimum(box1[2], boxes2[:, 2])
+    y1 = np.maximum(box1[1], boxes2[:, 1])
+    y2 = np.minimum(box1[3], boxes2[:, 3])
 
-    inter=np.maximum(x2-x1,0)*np.maximum(y2-y1,0)
-    iou=inter/(box1_area+box2_area[:]-inter[:])
+    intersection = np.maximum(x2 - x1, 0) * np.maximum(y2 - y1, 0)
+    iou = intersection / (box1_area + boxes2_area[:] - intersection[:])
     return iou
 
 def cal_overlaps(boxes1,boxes2):
@@ -87,7 +83,7 @@ def cal_overlaps(boxes1,boxes2):
     area2 = (boxes2[:, 0] - boxes2[:, 2]) * (boxes2[:, 1] - boxes2[:, 3])
     overlaps=np.zeros((boxes1.shape[0],boxes2.shape[0]))
     for i in range(boxes1.shape[0]):
-        overlaps[i][:]=cal_iou(boxes1[i],area1,boxes2,area2)
+        overlaps[i][:]=cal_iou(boxes1[i],area1[i],boxes2,area2)
     return overlaps
 
 def cal_rpn(imgsize,featuresize,scale,gtboxes,iou_positive,iou_negative,rpn_positive_num,rpn_total_num):
@@ -100,12 +96,12 @@ def cal_rpn(imgsize,featuresize,scale,gtboxes,iou_positive,iou_negative,rpn_posi
     labels.fill(-1)
     gt_argmax_overlaps=overlaps.argmax(axis=0)
     anchor_argmax_overlaps=overlaps.argmax(axis=1)
-    anchor_max_overlas=overlaps[range(overlaps.shape[0],anchor_argmax_overlaps)]
+    anchor_max_overlas=overlaps[range(overlaps.shape[0]),anchor_argmax_overlaps]
     labels[anchor_max_overlas>iou_positive]=1
     labels[anchor_max_overlas<iou_negative]=0
     labels[gt_argmax_overlaps]=1
 
-    outside_anchor=np.where((base_anchors[:,0]<0)|(base_anchors[:,1]<0)
+    outside_anchor=np.where((base_anchors[:,0]<0)|(base_anchors[:,1]<0)|
                             (base_anchors[:,2]>=imgw)|(base_anchors[:,3]>=imgh))[0]
     labels[outside_anchor]=-1
 
@@ -133,8 +129,8 @@ def bbox_transform(anchors,gtboxes):
     # a means anchor
     Cxa=(anchors[:,0]+anchors[:,2])*0.5
 
-    W=gtboxes[:,3]-gtboxes[:,1]+1.0
-    Wa=anchors[:,3]-anchors[:1]+1.0
+    W=gtboxes[:,2]-gtboxes[:,0]+1.0
+    Wa=anchors[:,2]-anchors[:,0]+1.0
     Vc=(Cx-Cxa)/Wa
     Vw=np.log(W/Wa)
     return np.vstack((Vc,Vw)).transpose()
@@ -181,12 +177,21 @@ class MyDataSet(Dataset):
             raise Exception('read xml error')
         img=Image.open(image_path)
         """
-        reshape image for batch training
+        修改原始图像后，对应的box也要修改
         TODO!
         """
         if self.image_shape!=None:
             #image_shape=(width,height)
+            original_size=img.size
+            x_scale = self.image_shape[0] / original_size[0]
+            y_scale = self.image_shape[1] / original_size[1]
+            newbox = []
+            for i in range(len(gtboxes)):
+                newbox.append(
+                    [gtboxes[i][0] * x_scale, gtboxes[i][1] * y_scale, gtboxes[i][2] * x_scale, gtboxes[i][3] * y_scale]
+                )
             img=img.resize((self.image_shape[0],self.image_shape[1]),Image.ANTIALIAS)
+            gtboxes=np.array(newbox)
         w,h=img.size
         if self.base_model_name=='vgg16':
             scale=16
@@ -203,7 +208,7 @@ class MyDataSet(Dataset):
         img=torch.from_numpy(img.transpose([2,0,1])).float()
         cls=torch.from_numpy(cls).float()
         regr=torch.from_numpy(regr).float()
-        return img,cls,regr
+        return img.cpu(),cls.cpu(),regr.cpu()
 
 if __name__=='__main__':
     # print(readxml('D:\py_projects\data_new\data_new\data\\annotation\img_calligraphy_00001_bg.xml'))

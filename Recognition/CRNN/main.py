@@ -90,7 +90,8 @@ class Recognition(object):
             validation_steps=self.val_generator.steps_per_epoch,
             epochs=self.epoch,
             initial_epoch=39,
-            callbacks=[checkpoint, early_stop, LR, TB]
+            callbacks=[checkpoint, early_stop, LR, TB],
+            shuffle=True
         )
         print(his)
 

@@ -1,8 +1,6 @@
-import tensorflow as tf
 from tensorflow.keras import layers
 from tensorflow.keras.applications import VGG16,InceptionResNetV2,DenseNet121,ResNet50,Xception
-from tensorflow.keras import Model,Input
-import tensorflow.keras.optimizers as optimizers
+from tensorflow.keras import Model
 class proposal_model(object):
     def __init__(self,base_model_name=None,image_shape=(None,None,3),k=10,trained_weight=None):
         self.base_model_name=base_model_name
