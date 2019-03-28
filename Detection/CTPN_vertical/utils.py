@@ -22,7 +22,7 @@ def readxml(path):
     return np.array(gtboxes),image_name
 
 
-def generate_anchors(featuremap_size=(32,16),scale=16,kmeans=False,k=None):
+def generate_anchors(featuremap_size=(64,32),scale=16,kmeans=False,k=None):
     """
 
     :param featuremap_size: 对于vgg16 feature map是/16 /16 .对于其他是不一样的
