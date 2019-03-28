@@ -223,7 +223,7 @@ if __name__=='__main__':
        image_shape=(256,512,3),
        initial_epoch=0,
        train_bs=50,
-       val_bs=1,
+       val_bs=50,
        lr=0.001
    )
    m.train()
