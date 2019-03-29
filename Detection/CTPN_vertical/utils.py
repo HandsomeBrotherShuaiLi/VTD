@@ -1,8 +1,13 @@
 import os,xml.etree.ElementTree as ET
 import numpy as np
-from PIL import Image
+from PIL import Image,ImageDraw
 from torch.utils.data import Dataset
 import torch
+def drawRect(gtboxes,img):
+    draw=ImageDraw.Draw(img)
+    for i in gtboxes:
+        draw.rectangle((i),outline='red')
+    img.show()
 
 def readxml(path):
     gtboxes=[]
@@ -135,6 +140,69 @@ def bbox_transform(anchors,gtboxes):
     Vw=np.log(W/Wa)
     return np.vstack((Vc,Vw)).transpose()
 
+def bbox_trasfor_inv(anchor,regr,scale):
+    """
+    anchor:(Nsample,4)
+    regr=(Nsample,2)
+    预测的时候，反向得到GT
+    :param anchor:
+    :param regr:
+    :param scale:
+    :return:
+    """
+    Cxa=(anchor[:,0]+anchor[:,2])*0.5 #anchor的中心点x坐标
+    Wa=anchor[:,2]-anchor[:,0]+1 # anchor's width
+
+    Delta_cx=regr[...,0] # 中心点x坐标偏移
+    Delta_w=regr[...,1] # width's delta value
+
+    GT_x=Delta_cx*Wa+Cxa # Ground Truth’s  x coordination
+    GT_w=np.exp(Delta_w)*Wa# Ground truth's width
+
+    Cya=(anchor[:,1]+anchor[:,3])*0.5 # anchor中心的y
+
+    y1=Cya-scale*0.5
+    x1=GT_x-GT_w*0.5
+    y2=Cya+scale*0.5
+    x2=GT_x+GT_w*0.5
+
+    bbox=np.vstack((x1,y1,x2,y2)).transpose()
+    return bbox
+
+def filter_bbox(bbox, minsize):
+    ws = bbox[:, 2] - bbox[:, 0] + 1
+    hs = bbox[:, 3] - bbox[:, 1] + 1
+    keep = np.where((ws >= minsize) & (hs >= minsize))[0]
+    return keep
+
+def nms(dets, thresh):
+    x1 = dets[:, 0]
+    y1 = dets[:, 1]
+    x2 = dets[:, 2]
+    y2 = dets[:, 3]
+    scores = dets[:, 4]
+
+    areas = (x2 - x1 + 1) * (y2 - y1 + 1)
+    order = scores.argsort()[::-1]  # Sort from high to low
+
+    keep = []
+    while order.size > 0:
+        i = order[0]
+        keep.append(i)
+        xx1 = np.maximum(x1[i], x1[order[1:]])
+        yy1 = np.maximum(y1[i], y1[order[1:]])
+        xx2 = np.minimum(x2[i], x2[order[1:]])
+        yy2 = np.minimum(y2[i], y2[order[1:]])
+
+        w = np.maximum(0.0, xx2 - xx1 + 1)
+        h = np.maximum(0.0, yy2 - yy1 + 1)
+        inter = w * h
+        ovr = inter / (areas[i] + areas[order[1:]] - inter)
+
+        inds = np.where(ovr <= thresh)[0]
+        order = order[inds + 1]
+    return keep
+
 
 class MyDataSet(Dataset):
     def __init__(self,image_dir,label_dir,image_shape=None,base_model_name='vgg16',iou_positive=0.7,iou_negative=0.3,
@@ -209,19 +277,4 @@ class MyDataSet(Dataset):
         cls=torch.from_numpy(cls).float()
         regr=torch.from_numpy(regr).float()
         return img.cpu(),cls.cpu(),regr.cpu()
-
-if __name__=='__main__':
-    # print(readxml('D:\py_projects\data_new\data_new\data\\annotation\img_calligraphy_00001_bg.xml'))
-    # img = Image.open('D:\py_projects\data_new\data_new\data\\train_img\img_calligraphy_00001_bg.jpg')
-    # img=(np.array(img) / 255.0) * 2.0 - 1.0
-    # print(img.shape)
-    # print(img)
-    #(w,h)
-    a=generate_anchors()
-    for i in a[:,0]:
-        print(i)
-    print(a.shape)
-
-
-
 

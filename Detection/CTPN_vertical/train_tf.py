@@ -1,8 +1,9 @@
 import numpy as np
 import os
 from PIL import Image
-from Detection.CTPN_vertical.utils import cal_rpn,readxml
+from Detection.CTPN_vertical.utils import cal_rpn,readxml,generate_anchors,bbox_trasfor_inv,nms
 from Detection.CTPN_vertical.model_keras import proposal_model
+from Detection.CTPN_vertical.utils import drawRect
 import tensorflow as tf
 import tensorflow.keras.backend as K
 import tensorflow.keras.optimizers as optimizers
@@ -36,6 +37,23 @@ class DataGenerator(object):
     def __init__(self,image_dir, mode,label_dir,input_index,batch_size,image_shape=None,k=10, base_model_name='vgg16',
                  iou_positive=0.7, iou_negative=0.3, iou_select=0.7, rpn_positive_num=150, rpn_total_num=300
                  ):
+        """
+        custom data generator for tensorflow
+
+        :param image_dir: all image folder
+        :param mode: 'train' or 'val'
+        :param label_dir: annotation folder
+        :param input_index: train index or val index
+        :param batch_size:
+        :param image_shape: reshape all the images at a static shape for batch training
+        :param k: k anchors for each 1x1 grid in the feature map
+        :param base_model_name:vgg16 resnet50 etc
+        :param iou_positive:
+        :param iou_negative:
+        :param iou_select:
+        :param rpn_positive_num:
+        :param rpn_total_num:
+        """
         self.mode=mode
         assert self.mode in ['train','val']
         self.image_dir=image_dir
@@ -120,6 +138,30 @@ class DataGenerator(object):
 class ctpn_tf_model(object):
     def __init__(self,img_dir,label_dir,version,optimizer,lr,ck_dir,log_dir,image_shape=None,k=10,val_size=2000, base_model_name='vgg16',epoch=100,initial_epoch=0,
                  iou_positive=0.7, iou_negative=0.3, iou_select=0.7, rpn_positive_num=150, rpn_total_num=300,train_bs=50,val_bs=50,trained_weight=None):
+        """
+        initial arguments
+        :param img_dir:
+        :param label_dir:
+        :param version:
+        :param optimizer:
+        :param lr:
+        :param ck_dir:
+        :param log_dir:
+        :param image_shape:
+        :param k:
+        :param val_size:
+        :param base_model_name:
+        :param epoch:
+        :param initial_epoch:
+        :param iou_positive:
+        :param iou_negative:
+        :param iou_select:
+        :param rpn_positive_num:
+        :param rpn_total_num:
+        :param train_bs:
+        :param val_bs:
+        :param trained_weight: load the trained weight for the next training
+        """
 
         self.img_dir=img_dir
         self.label_dir=label_dir
@@ -153,13 +195,17 @@ class ctpn_tf_model(object):
         self.train_index=[i for i in all_index if i not in self.val_index]
 
     def train(self):
+        """
+        train function: first, generate the data gen, then fit_generator
+        :return:
+        """
         train_gen=DataGenerator(image_dir=self.img_dir,label_dir=self.label_dir,mode='train',batch_size=self.train_bs,
                                 image_shape=self.img_shape,k=self.k,iou_select=self.iou_select,input_index=self.train_index,
                                 iou_negative=self.iou_negative,iou_positive=self.iou_positive,
                                 base_model_name=self.base_model_name,rpn_total_num=self.rpn_total_num,
                                 rpn_positive_num=self.rpn_positive_num)
         val_gen=DataGenerator(image_dir=self.img_dir,label_dir=self.label_dir,mode='val',image_shape=self.img_shape,
-                               k=self.k,iou_select=self.iou_select,batch_size=self.val_bs,input_index=self.val_index,
+                               k=self.k,iou_select=self.iou_select,batch_size=self.train_bs,input_index=self.val_index,
                                 iou_negative=self.iou_negative,iou_positive=self.iou_positive,
                                 base_model_name=self.base_model_name,rpn_total_num=self.rpn_total_num,
                                 rpn_positive_num=self.rpn_positive_num)
@@ -204,6 +250,86 @@ class ctpn_tf_model(object):
             callbacks=[checkpoint, early_stop, LR, TB]
         )
         print(his)
+
+    def predict(self,dir,predict_model_path,resize=False,mode=1):
+        """
+
+        :param dir:a dir or a image path
+        :param predict_model_path:
+        :param mode:1:show image,  2 return predict result
+        :return:
+        """
+        shape = (None, None, 3) if self.img_shape == None else (self.img_shape[1], self.img_shape[0], self.img_shape[2])
+        train_model, predict_model = proposal_model(base_model_name=self.base_model_name, k=self.k,
+                                                              trained_weight=self.trained_weight,
+                                                              image_shape=shape,
+                                                              bs=1
+                                                              ).model_ctpn()
+        predict_model.load_weights(predict_model_path)
+        if self.base_model_name=='vgg16':
+            scale=16
+        else:
+            scale=32
+        if os.path.isdir(dir):
+            img_list=[os.path.join(dir,i) for i in os.listdir(dir)]
+        else:
+            img_list=[dir]
+
+        original_shape_list=[]
+        radios=[]
+        for img_path in img_list:
+            img=Image.open(img_path)
+
+            # print(img_path)
+            origin_w,origin_h=img.size
+            w,h=origin_w,origin_h
+            if resize:
+                img=img.resize((self.img_shape[0], self.img_shape[1]), Image.ANTIALIAS)
+                x_radio,y_radio=self.img_shape[0]/origin_w,self.img_shape[1]/origin_h
+                radios.append([x_radio,y_radio])
+                w,h=self.img_shape[0],self.img_shape[1]
+            else:
+                if origin_w<16 and origin_h<16:
+                    img=img.resize((16,32),Image.ANTIALIAS)
+                    origin_w,origin_h=16,32
+                    w,h=origin_w,origin_h
+            original_shape_list.append([origin_w, origin_h])
+            img_pil=img
+            img = np.array(img)
+            img = (img / 255.0) * 2.0 - 1.0
+            img=np.expand_dims(img,axis=0)
+            cls,regr,cls_prob=predict_model.predict(img)
+
+            if resize:
+                anchors=generate_anchors(featuremap_size=(int(self.img_shape[1]/scale),int(self.img_shape[0]/scale)),
+                                         scale=scale,kmeans=False)
+            else:
+                anchors=generate_anchors(featuremap_size=(int(origin_h/scale),int(origin_w/scale)),
+                                         scale=scale,kmeans=False)
+            bbox=bbox_trasfor_inv(anchors,regr,scale)
+
+            fg=np.where(cls_prob[0,:,0]>self.iou_select)[0]
+
+            select_anchor=bbox[fg,:]
+            select_score=cls_prob[0,fg,0]
+            select_anchor=select_anchor.astype('int32')
+
+
+            #filter box
+            # keep_index=filter_bbox(select_anchor,scale)
+            # select_anchor=select_anchor[keep_index]
+            # select_score=select_score[keep_index]
+
+            select_score=np.reshape(select_score,(select_score.shape[0],1))
+            nmsbox=np.hstack((select_anchor,select_score))
+            keep=nms(nmsbox,1-self.iou_select)
+            select_anchor=select_anchor[keep]
+            select_score=select_score[keep]
+
+            
+
+
+
 if __name__=='__main__':
    m=ctpn_tf_model(
        img_dir='D:\py_projects\data_new\data_new\data\\train_img',
@@ -218,4 +344,5 @@ if __name__=='__main__':
        val_bs=5,
        lr=0.001
    )
-   m.train()
+   m.predict(dir='D:\py_projects\data_new\data_new\data\\test_img',resize=True,
+             predict_model_path='D:\py_projects\VTD\model\keras_ctpn_v1\ctpn-keras--14--0.05821.hdf5')
