@@ -8,9 +8,7 @@ import tensorflow.keras.backend as K
 import tensorflow.keras.optimizers as optimizers
 from tensorflow.keras.callbacks import ReduceLROnPlateau,ModelCheckpoint,EarlyStopping,TensorBoard
 def rpn_regr_loss(y_true,y_pred):
-    print('rpn_regr_loss')
-    print(y_true.shape)
-    print(y_pred.shape)
+
     sigma = 9.0
     cls = y_true[0, :, 0]
     regr = y_true[0, :, 1:3]
@@ -24,22 +22,19 @@ def rpn_regr_loss(y_true,y_pred):
     return K.switch(tf.size(loss) > 0, K.mean(loss), K.constant(0.0))
 
 def rpn_cls_loss(y_true,y_pred):
-    print('rpn_cls_loss')
-    print(y_true.shape)
-    print(y_pred.shape)
+
     y_true = y_true[0][0]
     cls_keep = tf.where(tf.not_equal(y_true, -1))[:, 0]
     cls_true = tf.gather(y_true, cls_keep)
     cls_pred = tf.gather(y_pred[0], cls_keep)
     cls_true = tf.cast(cls_true, 'int64')
-    # loss = K.sparse_categorical_crossentropy(cls_true,cls_pred,from_logits=True)
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=cls_true, logits=cls_pred)
     return K.switch(tf.size(loss) > 0, K.clip(K.mean(loss), 0, 10), K.constant(0.0))
 
 
 class DataGenerator(object):
-    def __init__(self,image_dir, mode,label_dir,val_size=2000,image_shape=None,k=10, base_model_name='vgg16',
-                 iou_positive=0.7, iou_negative=0.3, iou_select=0.7, rpn_positive_num=150, rpn_total_num=300,train_bs=50,val_bs=50
+    def __init__(self,image_dir, mode,label_dir,input_index,batch_size,image_shape=None,k=10, base_model_name='vgg16',
+                 iou_positive=0.7, iou_negative=0.3, iou_select=0.7, rpn_positive_num=150, rpn_total_num=300
                  ):
         self.mode=mode
         assert self.mode in ['train','val']
@@ -49,7 +44,6 @@ class DataGenerator(object):
             raise Exception('invalid directory,please check your image dir and label dir')
         if len(os.listdir(self.image_dir))!=len(os.listdir(self.label_dir)):
             raise Exception('Different lengths of input dir file,in fact, they are supposed to have the same file number')
-        self.val_size=val_size
         self.image_shape=image_shape
         self.k=k
         self.base_model_name=base_model_name
@@ -58,20 +52,11 @@ class DataGenerator(object):
         self.iou_select=iou_select
         self.rpn_positive_num=rpn_positive_num
         self.rpn_total_num=rpn_total_num
-        self.train_bs=train_bs
-        self.val_bs=val_bs
+        self.batch_size=batch_size
+        self.input_index=input_index
         if self.image_shape==None:#else (w,h)
-            self.train_bs,self.val_bs=1,1
-        self.total_len = len(os.listdir(self.image_dir))
-        self.all_index = np.array(range(self.total_len))
-        if self.mode=='train':
-            self.steps_per_epoch=((self.total_len)-self.val_size)//self.train_bs
-        else:
-            self.steps_per_epoch=self.val_size//self.val_bs
-    def __shuffle__(self):
-        np.random.shuffle(self.all_index)
-        self.val_index=np.random.choice(self.all_index,size=self.val_size,replace=False)
-        self.train_index=[i for i in self.all_index if i not in self.val_index]
+            self.batch_size=1
+        self.steps_per_epoch=len(self.input_index)//self.batch_size
     def generator(self):
         input_batch_imgs=[]
         batch_cls=[]
@@ -79,11 +64,8 @@ class DataGenerator(object):
         batch_count = 0
         all_image_name=os.listdir(self.image_dir)
         while True:
-            self.__shuffle__()
-            mapping = {'train': self.train_index, 'val': self.val_index}
-            img_index = mapping[self.mode]
-            batch_size_mapping = {'train': self.train_bs, 'val': self.val_bs}
-            for i in img_index:
+
+            for i in self.input_index:
                 img_name=all_image_name[i]
                 label_name=img_name.replace('.jpg','.xml')
                 img=Image.open(os.path.join(self.image_dir,img_name))
@@ -122,23 +104,29 @@ class DataGenerator(object):
                 batch_cls.append(cls)
                 batch_regr.append(regr)
                 batch_count+=1
-                if batch_count>=batch_size_mapping[self.mode]:
+                if batch_count>=self.batch_size:
                     input_imgs=np.array(input_batch_imgs)
                     np_batch_cls=np.array(batch_cls)
                     np_batch_regr=np.array(batch_regr)
-                    # print(input_imgs.shape,np_batch_regr.shape,np_batch_cls.shape)
+
                     yield input_imgs,{'rpn_class_finnal':np_batch_cls,'rpn_regr_finnal':np_batch_regr}
 
                     input_batch_imgs = []
                     batch_cls = []
                     batch_regr = []
                     batch_count = 0
+            np.random.shuffle(self.input_index)
 
-class ctpn_tf_model_trainer(object):
+class ctpn_tf_model(object):
     def __init__(self,img_dir,label_dir,version,optimizer,lr,ck_dir,log_dir,image_shape=None,k=10,val_size=2000, base_model_name='vgg16',epoch=100,initial_epoch=0,
                  iou_positive=0.7, iou_negative=0.3, iou_select=0.7, rpn_positive_num=150, rpn_total_num=300,train_bs=50,val_bs=50,trained_weight=None):
+
         self.img_dir=img_dir
         self.label_dir=label_dir
+        if os.path.isdir(self.img_dir)==False or os.path.isdir(self.label_dir)==False:
+            raise Exception('folder error')
+        if len(os.listdir(self.img_dir))!=len(os.listdir(self.label_dir)):
+            raise Exception('folder file length error!')
         self.version=version
         self.img_shape=image_shape#(w,h,3)
         self.k=k
@@ -159,16 +147,20 @@ class ctpn_tf_model_trainer(object):
         self.lr=lr
         self.ck_dir=ck_dir
         self.log_dir=log_dir
+        all_index = np.array(range(len(os.listdir(self.img_dir))))
+        np.random.shuffle(all_index)
+        self.val_index=np.random.choice(all_index,size=self.val_size,replace=False)
+        self.train_index=[i for i in all_index if i not in self.val_index]
 
     def train(self):
-        train_gen=DataGenerator(image_dir=self.img_dir,label_dir=self.label_dir,mode='train',val_size=self.val_size,
-                                val_bs=self.val_bs,image_shape=self.img_shape,k=self.k,iou_select=self.iou_select,
-                                iou_negative=self.iou_negative,iou_positive=self.iou_positive,train_bs=self.train_bs,
+        train_gen=DataGenerator(image_dir=self.img_dir,label_dir=self.label_dir,mode='train',batch_size=self.train_bs,
+                                image_shape=self.img_shape,k=self.k,iou_select=self.iou_select,input_index=self.train_index,
+                                iou_negative=self.iou_negative,iou_positive=self.iou_positive,
                                 base_model_name=self.base_model_name,rpn_total_num=self.rpn_total_num,
                                 rpn_positive_num=self.rpn_positive_num)
-        val_gen=DataGenerator(image_dir=self.img_dir,label_dir=self.label_dir,mode='val',val_size=self.val_size,
-                                val_bs=self.val_bs,image_shape=self.img_shape,k=self.k,iou_select=self.iou_select,
-                                iou_negative=self.iou_negative,iou_positive=self.iou_positive,train_bs=self.train_bs,
+        val_gen=DataGenerator(image_dir=self.img_dir,label_dir=self.label_dir,mode='val',image_shape=self.img_shape,
+                               k=self.k,iou_select=self.iou_select,batch_size=self.val_bs,input_index=self.val_index,
+                                iou_negative=self.iou_negative,iou_positive=self.iou_positive,
                                 base_model_name=self.base_model_name,rpn_total_num=self.rpn_total_num,
                                 rpn_positive_num=self.rpn_positive_num)
         shape=(None,None,3) if self.img_shape==None else (self.img_shape[1],self.img_shape[0],self.img_shape[2])
@@ -185,8 +177,8 @@ class ctpn_tf_model_trainer(object):
             opt=optimizers.Adadelta(lr=self.lr)
         else:
             opt=optimizers.SGD(self.lr,decay=1e-6, momentum=0.9, nesterov=True)
-        LR = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=5, min_lr=0, verbose=1)
-        early_stop = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=11, mode='min', verbose=1)
+        LR = ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=4, min_lr=0, verbose=1)
+        early_stop = EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, mode='min', verbose=1)
         t=os.path.join(self.ck_dir,self.version)
         if os.path.isdir(t)==False:
             os.mkdir(t)
@@ -213,7 +205,7 @@ class ctpn_tf_model_trainer(object):
         )
         print(his)
 if __name__=='__main__':
-   m=ctpn_tf_model_trainer(
+   m=ctpn_tf_model(
        img_dir='D:\py_projects\data_new\data_new\data\\train_img',
        label_dir='D:\py_projects\data_new\data_new\data\\annotation',
        version='keras_ctpn_v1',
@@ -222,8 +214,8 @@ if __name__=='__main__':
        ck_dir='D:\py_projects\VTD\model',
        image_shape=(256,512,3),
        initial_epoch=0,
-       train_bs=50,
-       val_bs=50,
+       train_bs=5,
+       val_bs=5,
        lr=0.001
    )
    m.train()
