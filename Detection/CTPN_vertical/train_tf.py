@@ -3,7 +3,8 @@ import os
 from PIL import Image
 from Detection.CTPN_vertical.utils import cal_rpn,readxml,generate_anchors,bbox_trasfor_inv,nms
 from Detection.CTPN_vertical.model_keras import proposal_model
-from Detection.CTPN_vertical.utils import drawRect
+from Detection.CTPN_vertical.utils import drawRect,TextProposalConnectorOriented
+from Detection.CTPN_vertical.LineGraphy import clip_boxes
 import tensorflow as tf
 import tensorflow.keras.backend as K
 import tensorflow.keras.optimizers as optimizers
@@ -325,8 +326,12 @@ class ctpn_tf_model(object):
             keep=nms(nmsbox,1-self.iou_select)
             select_anchor=select_anchor[keep]
             select_score=select_score[keep]
+            textConn = TextProposalConnectorOriented()
+            text = textConn.get_text_lines(select_anchor, select_score, [h, w])
+            drawRect(text,img_pil)
 
-            
+
+
 
 
 
