@@ -1,8 +1,44 @@
-import os,xml.etree.ElementTree as ET
 import numpy as np
+import os,xml.etree.ElementTree as ET
+import cv2
+import matplotlib.pyplot as plt
+from glob import glob
+from concurrent.futures import ThreadPoolExecutor
+import tensorflow as tf
 from PIL import Image,ImageDraw
-from torch.utils.data import Dataset
-import torch
+from math import *
+anchor_scale = 16
+#
+IOU_NEGATIVE = 0.3
+IOU_POSITIVE = 0.7
+IOU_SELECT = 0.7
+
+RPN_POSITIVE_NUM = 150
+RPN_TOTAL_NUM = 300
+
+# bgr  can find from  here https://github.com/fchollet/deep-learning-models/blob/master/imagenet_utils.py
+IMAGE_MEAN = [123.68, 116.779, 103.939]
+
+DEBUG = True
+def rotate(img_path):
+
+    img=cv2.imread(img_path)
+    height, width = img.shape[:2]
+
+    degree = 90
+    # 旋转后的尺寸
+    heightNew = int(width * fabs(sin(radians(degree))) + height * fabs(cos(radians(degree))))  # 这个公式参考之前内容
+    widthNew = int(height * fabs(sin(radians(degree))) + width * fabs(cos(radians(degree))))
+
+    matRotation = cv2.getRotationMatrix2D((width / 2, height / 2), degree, 1)
+
+    matRotation[0, 2] += (widthNew - width) / 2  # 因为旋转之后,坐标系原点是新图像的左上角,所以需要根据原图做转化
+    matRotation[1, 2] += (heightNew - height) / 2
+
+    imgRotation = cv2.warpAffine(img, matRotation, (widthNew, heightNew), borderValue=(255, 255, 255))
+
+    return Image.fromarray(imgRotation)
+
 def drawRect(gtboxes,img):
     draw=ImageDraw.Draw(img)
     for i in gtboxes:
@@ -27,44 +63,46 @@ def readxml(path):
     return np.array(gtboxes),image_name
 
 
-def generate_anchors(featuremap_size=(64,32),scale=16,kmeans=False,k=None):
+def gen_anchor(featuresize, scale):
+    """
+    gen base anchor from feature map [HXW][10][4]
+    reshape  [HXW][10][4] to [HXWX10][4]
+    生成的锚框是相对于原图的，即原图中每16像素就有10个锚框
     """
 
-    :param featuremap_size: 对于vgg16 feature map是/16 /16 .对于其他是不一样的
-    :param scale:
-    :return:
-    """
-    if kmeans==False:
-        # heights=[2]*10
-        # widths=[1, 2, 4,6,8,12,16,26,32,50]
-        heights=[16]*10
-        widths=[11,16,23,33,48,68,97,139,198,256]
+    heights = [11, 16, 23, 33, 48, 68, 97, 139, 198, 283]
+    widths = [16, 16, 16, 16, 16, 16, 16, 16, 16, 16]
 
-        heights=np.array(heights).reshape(len(heights),1)
-        widths=np.array(widths).reshape(len(widths),1)
+    # gen k=9 anchor size (h,w)
+    heights = np.array(heights).reshape(len(heights), 1)
+    widths = np.array(widths).reshape(len(widths), 1)
 
-        base_anchor=np.array([0,0,15,15])
-        xt=(base_anchor[0]+base_anchor[2])*0.5
-        yt=(base_anchor[1]+base_anchor[3])*0.5
-        x1=xt-widths*0.5
-        y1=yt-heights*0.5
-        x2=xt+widths*0.5
-        y2=yt+heights*0.5
-        base_anchor=np.hstack((x1,y1,x2,y2))
+    # 锚框大小为16像素
+    base_anchor = np.array([0, 0, 15, 15])
+    # center x,y
+    xt = (base_anchor[0] + base_anchor[2]) * 0.5
+    yt = (base_anchor[1] + base_anchor[3]) * 0.5
 
-        h,w=featuremap_size
-        shift_x=np.arange(0,w)*scale
-        shift_y=np.arange(0,h)*scale
-        anchor=[]
-        for i in shift_y:
-            for j in shift_x:
-                anchor.append(base_anchor+[j,i,j,i])
-        return np.array(anchor).reshape(-1,4)
-    else:
-        """
-        使用kmeans聚类生成最合适的k个anchor,参考yolo_v3
-        """
-        pass
+    # x1 y1 x2 y2
+    x1 = xt - widths * 0.5
+    y1 = yt - heights * 0.5
+    x2 = xt + widths * 0.5
+    y2 = yt + heights * 0.5
+
+    # 一组十个锚框
+    base_anchor = np.hstack((x1, y1, x2, y2))
+
+    h, w = featuresize
+    shift_x = np.arange(0, w) * scale
+    shift_y = np.arange(0, h) * scale
+    # apply shift
+    anchor = []
+    for i in shift_y:
+        for j in shift_x:
+            anchor.append(base_anchor + [j, i, j, i])
+    return np.array(anchor).reshape((-1, 4))
+
+
 def cal_iou(box1, box1_area, boxes2, boxes2_area):
     """
     box1 [x1,y1,x2,y2]
@@ -79,105 +117,189 @@ def cal_iou(box1, box1_area, boxes2, boxes2_area):
     iou = intersection / (box1_area + boxes2_area[:] - intersection[:])
     return iou
 
-def cal_overlaps(boxes1,boxes2):
-    """
 
-    :param boxes1: box list anchors
-    :param boxes2: box list ground truth box
-    :return:
+def cal_overlaps(boxes1, boxes2):
     """
-    area1=(boxes1[:,0]-boxes1[:,2])*(boxes1[:,1]-boxes1[:,3])
-    area2 = (boxes2[:, 0] - boxes2[:, 2]) * (boxes2[:, 1] - boxes2[:, 3])
-    overlaps=np.zeros((boxes1.shape[0],boxes2.shape[0]))
+    boxes1 [Nsample,x1,y1,x2,y2]  anchor
+    boxes2 [Msample,x1,y1,x2,y2]  grouth-box
+
+    """
+    area1 = (boxes1[:, 0] - boxes1[:, 2]) * (boxes1[:, 1] - boxes1[:, 3])  # (Nsample, 1)
+    area2 = (boxes2[:, 0] - boxes2[:, 2]) * (boxes2[:, 1] - boxes2[:, 3])  # (Msample, 1)
+
+    overlaps = np.zeros((boxes1.shape[0], boxes2.shape[0]))  # (Nsample, Msample)
+
+    # calculate the intersection of  boxes1(anchor) and boxes2(GT box)
     for i in range(boxes1.shape[0]):
-        overlaps[i][:]=cal_iou(boxes1[i],area1[i],boxes2,area2)
+        overlaps[i][:] = cal_iou(boxes1[i], area1[i], boxes2, area2)
+
     return overlaps
 
-def cal_rpn(imgsize,featuresize,scale,gtboxes,iou_positive,iou_negative,rpn_positive_num,rpn_total_num):
-    #使用PIL,img size 是（w,h)
-    imgw,imgh=imgsize
-    base_anchors=generate_anchors(featuresize,scale)
-    overlaps=cal_overlaps(base_anchors,gtboxes)
-    #0 represents negative box,1 represents positive box
-    labels=np.empty(base_anchors.shape[0])
-    labels.fill(-1)
-    gt_argmax_overlaps=overlaps.argmax(axis=0)
-    anchor_argmax_overlaps=overlaps.argmax(axis=1)
-    anchor_max_overlas=overlaps[range(overlaps.shape[0]),anchor_argmax_overlaps]
-    labels[anchor_max_overlas>iou_positive]=1
-    labels[anchor_max_overlas<iou_negative]=0
-    labels[gt_argmax_overlaps]=1
 
-    outside_anchor=np.where((base_anchors[:,0]<0)|(base_anchors[:,1]<0)|
-                            (base_anchors[:,2]>=imgw)|(base_anchors[:,3]>=imgh))[0]
-    labels[outside_anchor]=-1
-
-    fg_index=np.where(labels==1)[0]
-    if len(fg_index)>rpn_positive_num:
-        labels[np.random.choice(fg_index,len(fg_index)-rpn_positive_num,replace=False)]=-1
-    bg_index=np.where(labels==0)[0]
-    num_bg=rpn_total_num-np.sum(labels==1)
-    if len(bg_index)>num_bg:
-        labels[np.random.choice(bg_index,len(bg_index)-num_bg,replace=False)]=-1
-    #calculate bbox targets
-    bbox_targets=bbox_transform(base_anchors,gtboxes[anchor_argmax_overlaps,:])
-    return [labels,bbox_targets],base_anchors
-
-def bbox_transform(anchors,gtboxes):
+def bbox_transfrom(anchors, gtboxes):
     """
-    compute the relative predicted horizonal(x) coordinates Vc,Vw
-    becuase we have fixed height 16 or 32, width is variable
-    :param anchors:
-    :param gtboxes:
-    :return:
+    anchors: (Nsample, 4)
+    gtboxes: (Nsample, 4)
+     compute relative predicted vertical coordinates Vc ,Vh
+        with respect to the bounding box location of an anchor
     """
-    Cx=(gtboxes[:,0]+gtboxes[:,2])*0.5
-    # a means anchor
-    Cxa=(anchors[:,0]+anchors[:,2])*0.5
+    Cy = (gtboxes[:, 1] + gtboxes[:, 3]) * 0.5  # (Nsample, )
+    Cya = (anchors[:, 1] + anchors[:, 3]) * 0.5  # (Nsample, )
+    h = gtboxes[:, 3] - gtboxes[:, 1] + 1.0  # (Nsample, )
+    ha = anchors[:, 3] - anchors[:, 1] + 1.0  # (Nsample, )
 
-    W=gtboxes[:,2]-gtboxes[:,0]+1.0
-    Wa=anchors[:,2]-anchors[:,0]+1.0
-    Vc=(Cx-Cxa)/Wa
-    Vw=np.log(W/Wa)
-    return np.vstack((Vc,Vw)).transpose()
+    Vc = (Cy - Cya) / ha  # (Nsample, )
+    Vh = np.log(h / ha)  # (Nsample, )
 
-def bbox_trasfor_inv(anchor,regr,scale):
+    ret = np.vstack((Vc, Vh))
+
+    return ret.transpose()  # (Nsample, 2)
+
+
+def bbox_transfor_inv(anchor, regr):
     """
-    anchor:(Nsample,4)
-    regr=(Nsample,2)
-    预测的时候，反向得到GT
-    :param anchor:
-    :param regr:
-    :param scale:
-    :return:
+    anchor: (NSample, 4)
+    regr: (NSample, 2)
+    根据锚框和偏移量反向得到GTBox
     """
-    print(anchor)
-    Cxa=(anchor[:,0]+anchor[:,2])*0.5 #anchor的中心点x坐标
-    Wa=anchor[:,2]-anchor[:,0]+1 # anchor's width
-    print('wa',Wa)
 
-    Delta_cx=regr[...,0] # 中心点x坐标偏移
-    Delta_w=regr[...,1] # width's delta value
+    Cya = (anchor[:, 1] + anchor[:, 3]) * 0.5  # 锚框y中心点
+    ha = anchor[:, 3] - anchor[:, 1] + 1
 
-    GT_x=Delta_cx*Wa+Cxa # Ground Truth’s  x coordination
-    GT_w=np.exp(Delta_w)*Wa# Ground truth's width
-    print(GT_w)
+    Vcx = regr[..., 0]  # y中心点偏移
+    Vhx = regr[..., 1]  # 高度偏移
 
-    Cya=(anchor[:,1]+anchor[:,3])*0.5 # anchor中心的y
+    Cyx = Vcx * ha + Cya  # GTBox y中心点
+    hx = np.exp(Vhx) * ha  # GTBox 高
+    xt = (anchor[:, 0] + anchor[:, 2]) * 0.5  # 锚框x中心点
 
-    y1=Cya-scale*0.5
-    x1=GT_x-GT_w*0.5
-    y2=Cya+scale*0.5
-    x2=GT_x+GT_w*0.5
+    x1 = xt - 16 * 0.5
+    y1 = Cyx - hx * 0.5
+    x2 = xt + 16 * 0.5
+    y2 = Cyx + hx * 0.5
+    bbox = np.vstack((x1, y1, x2, y2)).transpose()
 
-    bbox=np.vstack((x1,y1,x2,y2)).transpose()
     return bbox
+
+
+def clip_box(bbox, im_shape):
+    # x1 >= 0
+    bbox[:, 0] = np.maximum(np.minimum(bbox[:, 0], im_shape[1] - 1), 0)
+    # y1 >= 0
+    bbox[:, 1] = np.maximum(np.minimum(bbox[:, 1], im_shape[0] - 1), 0)
+    # x2 < im_shape[1]
+    bbox[:, 2] = np.maximum(np.minimum(bbox[:, 2], im_shape[1] - 1), 0)
+    # y2 < im_shape[0]
+    bbox[:, 3] = np.maximum(np.minimum(bbox[:, 3], im_shape[0] - 1), 0)
+
+    return bbox
+
 
 def filter_bbox(bbox, minsize):
     ws = bbox[:, 2] - bbox[:, 0] + 1
     hs = bbox[:, 3] - bbox[:, 1] + 1
     keep = np.where((ws >= minsize) & (hs >= minsize))[0]
     return keep
+
+
+def cal_rpn(imgsize, featuresize, scale, gtboxes):
+    """
+    gtboxes: (Msample, 4)
+    """
+    imgh, imgw = imgsize
+
+    # gen base anchor
+    base_anchor = gen_anchor(featuresize, scale)  # (Nsample, 4)
+
+    # calculate iou
+    overlaps = cal_overlaps(base_anchor, gtboxes)  # (Nsample, Msample)
+
+    # init labels -1 don't care  0 is negative  1 is positive
+    labels = np.empty(base_anchor.shape[0])
+    labels.fill(-1)  # (Nsample,)
+
+    # for each GT box corresponds to an anchor which has highest IOU
+    gt_argmax_overlaps = overlaps.argmax(axis=0)  # (Msample, )
+
+    # the anchor with the highest IOU overlap with a GT box
+    anchor_argmax_overlaps = overlaps.argmax(axis=1)  # (Nsample, )
+    anchor_max_overlaps = overlaps[range(overlaps.shape[0]), anchor_argmax_overlaps]  # (Nsample, )
+
+    # IOU > IOU_POSITIVE
+    labels[anchor_max_overlaps > IOU_POSITIVE] = 1
+    # IOU <IOU_NEGATIVE
+    labels[anchor_max_overlaps < IOU_NEGATIVE] = 0
+    # ensure that every GT box has at least one positive RPN region
+    labels[gt_argmax_overlaps] = 1
+
+    # only keep anchors inside the image
+    outside_anchor = np.where(
+        (base_anchor[:, 0] < 0) |
+        (base_anchor[:, 1] < 0) |
+        (base_anchor[:, 2] >= imgw) |
+        (base_anchor[:, 3] >= imgh)
+    )[0]
+    labels[outside_anchor] = -1
+
+    # 剔除掉多余的正负样例
+    # subsample positive labels ,if greater than RPN_POSITIVE_NUM(default 128)
+    fg_index = np.where(labels == 1)[0]
+    if (len(fg_index) > RPN_POSITIVE_NUM):
+        labels[np.random.choice(fg_index, len(fg_index) - RPN_POSITIVE_NUM, replace=False)] = -1
+
+    # subsample negative labels
+    bg_index = np.where(labels == 0)[0]
+    num_bg = RPN_TOTAL_NUM - np.sum(labels == 1)
+    if (len(bg_index) > num_bg):
+        # print('bgindex:',len(bg_index),'num_bg',num_bg)
+        labels[np.random.choice(bg_index, len(bg_index) - num_bg, replace=False)] = -1
+
+    # calculate bbox targets
+    # debug here
+    bbox_targets = bbox_transfrom(base_anchor, gtboxes[anchor_argmax_overlaps, :])
+    # bbox_targets=[]
+
+    return [labels, bbox_targets], base_anchor
+
+
+def get_session(gpu_fraction=0.6):
+    '''''Assume that you have 6GB of GPU memory and want to allocate ~2GB'''
+
+    num_threads = os.environ.get('OMP_NUM_THREADS')
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=gpu_fraction)
+
+    if num_threads:
+        return tf.Session(config=tf.ConfigProto(
+            gpu_options=gpu_options, intra_op_parallelism_threads=num_threads, allow_soft_placement=True))
+    else:
+        return tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True))
+
+
+class random_uniform_num():
+    """
+    uniform random
+    """
+
+    def __init__(self, total, start=0):
+        self.total = total
+        self.range = [i for i in range(total)]
+        np.random.shuffle(self.range)
+        self.index = start
+
+    def get(self, batch_size):
+        ret = []
+        if self.index + batch_size > self.total:
+            piece1 = self.range[self.index:]
+            np.random.shuffle(self.range)
+            self.index = (self.index + batch_size) - self.total
+            piece2 = self.range[0:self.index]
+            ret.extend(piece1)
+            ret.extend(piece2)
+        else:
+            ret = self.range[self.index:self.index + batch_size]
+            self.index = self.index + batch_size
+        return ret
+
 
 def nms(dets, thresh):
     x1 = dets[:, 0]
@@ -208,92 +330,65 @@ def nms(dets, thresh):
     return keep
 
 
-class MyDataSet(Dataset):
-    def __init__(self,image_dir,label_dir,image_shape=None,base_model_name='vgg16',iou_positive=0.7,iou_negative=0.3,
-                 iou_select=0.7,rpn_positive_num=150,rpn_total_num=300):
-        """
+def gen_sample(xmlpath, imgpath, batchsize=1):
+    """
+    由于图像大小不定，批处理大小只能为1
+    """
 
-        :param image_dir:
-        :param label_dir: xml dir
-        :param image_shape:
-        """
-        if os.path.isdir(image_dir)==False:
-            raise Exception('{} not exist'.format(image_dir))
-        if os.path.isdir(label_dir)==False:
-            raise Exception('{} not exist'.format(label_dir))
-        self.image_dir=image_dir
-        self.label_dir=label_dir
-        if len(os.listdir(self.image_dir))!=len(os.listdir(self.label_dir)):
-            raise Exception('image number != label number ')
-        else:
-            print('image number={}, label number={}'.format(len(os.listdir(self.image_dir)),len(os.listdir(self.label_dir))))
-        self.image_shape=image_shape
-        self.image_list=os.listdir(self.image_dir)
-        self.label_list=os.listdir(self.label_dir)
-        self.base_model_name=base_model_name
-        self.iou_positive=iou_positive
-        self.iou_negative=iou_negative
-        self.iou_select=iou_select
-        self.rpn_total_num=rpn_total_num
-        self.rpn_positive_num=rpn_positive_num
+    # list xml
+    xmlfiles = glob(xmlpath + '/*.xml')
+    rd = random_uniform_num(len(xmlfiles))
+    xmlfiles = np.array(xmlfiles)
 
-    def __len__(self):
-        return len(os.listdir(self.image_dir))
+    while True:
+        shuf = xmlfiles[rd.get(1)]
+        gtbox, imgfile = readxml(shuf[0])
+        img = cv2.imread(imgpath + "\\" + imgfile)
+        h, w, c = img.shape
 
-    def __getitem__(self,index):
-        image_name=self.image_list[index]
-        image_path=os.path.join(self.image_dir,image_name)
-        label_path=os.path.join(self.label_dir,image_name.replace('.jpg','.xml'))
-        gtboxes,xml_filename=readxml(label_path)
-        if xml_filename!=image_name:
-            raise Exception('read xml error')
-        img=Image.open(image_path)
-        """
-        修改原始图像后，对应的box也要修改
-        TODO!
-        """
-        if self.image_shape!=None:
-            #image_shape=(width,height)
-            original_size=img.size
-            x_scale = self.image_shape[0] / original_size[0]
-            y_scale = self.image_shape[1] / original_size[1]
-            newbox = []
-            for i in range(len(gtboxes)):
-                newbox.append(
-                    [gtboxes[i][0] * x_scale, gtboxes[i][1] * y_scale, gtboxes[i][2] * x_scale, gtboxes[i][3] * y_scale]
-                )
-            img=img.resize((self.image_shape[0],self.image_shape[1]),Image.ANTIALIAS)
-            gtboxes=np.array(newbox)
-        w,h=img.size
-        if self.base_model_name=='vgg16':
-            scale=16
-        else:
-            scale=32
-        [cls,regr],_=cal_rpn(imgsize=(w,h),featuresize=(int(h/scale),int(w/scale)),scale=scale,gtboxes=gtboxes,
-                             iou_positive=self.iou_positive,iou_negative=self.iou_negative,
-                             rpn_total_num=self.rpn_total_num,rpn_positive_num=self.rpn_positive_num)
-        img=np.array(img)
-        img=(img / 255.0) * 2.0 - 1.0
-        regr=np.hstack([cls.reshape(cls.shape[0],1),regr])
-        cls=np.expand_dims(cls,axis=0)
-        #pytorch 是channel first的,所以得把numpy 图片的第三维channel放在首位
-        img=torch.from_numpy(img.transpose([2,0,1])).float()
-        cls=torch.from_numpy(cls).float()
-        regr=torch.from_numpy(regr).float()
-        return img.cpu(),cls.cpu(),regr.cpu()
+        # clip image
+        if np.random.randint(0, 100) > 50:
+            img = img[:, ::-1, :]
+            newx1 = w - gtbox[:, 2] - 1
+            newx2 = w - gtbox[:, 0] - 1
+            gtbox[:, 0] = newx1
+            gtbox[:, 2] = newx2
 
-class TextLineCfg:
-    SCALE=600
-    MAX_SCALE=1200
-    TEXT_PROPOSALS_WIDTH=2
-    MIN_NUM_PROPOSALS = 2
-    MIN_RATIO=0.5
-    LINE_MIN_SCORE=0.9
-    MAX_HORIZONTAL_GAP=60
-    TEXT_PROPOSALS_MIN_SCORE=0.7
-    TEXT_PROPOSALS_NMS_THRESH=0.3
-    MIN_V_OVERLAPS=0.6
-    MIN_SIZE_SIM=0.6
+        [cls, regr], _ = cal_rpn((h, w), (int(h / 16), int(w / 16)), 16, gtbox)
+        # zero-center by mean pixel
+        m_img = img - IMAGE_MEAN
+        m_img = np.expand_dims(m_img, axis=0)
+
+        regr = np.hstack([cls.reshape(cls.shape[0], 1), regr])
+
+        #
+        cls = np.expand_dims(cls, axis=0)
+        cls = np.expand_dims(cls, axis=1)
+        # regr = np.expand_dims(regr,axis=1)
+        regr = np.expand_dims(regr, axis=0)
+
+        yield m_img, {'rpn_class_reshape': cls, 'rpn_regress_reshape': regr}
+
+
+def rpn_test():
+    xmlpath = 'G:\data\VOCdevkit\VOC2007\Annotations\img_4375.xml'
+    imgpath = 'G:\data\VOCdevkit\VOC2007\JPEGImages\img_4375.jpg'
+    gtbox, _ = readxml(xmlpath)
+    img = cv2.imread(imgpath)
+    h, w, c = img.shape
+    [cls, regr], base_anchor = cal_rpn((h, w), (int(h / 16), int(w / 16)), 16, gtbox)
+    print(cls.shape)
+    print(regr.shape)
+
+    regr = np.expand_dims(regr, axis=0)
+    inv_anchor = bbox_transfor_inv(base_anchor, regr)
+    anchors = inv_anchor[cls == 1]
+    anchors = anchors.astype(int)
+    for i in anchors:
+        cv2.rectangle(img, (i[0], i[1]), (i[2], i[3]), (255, 0, 0), 3)
+    plt.imshow(img)
+
+
 def threshold(coords, min_, max_):
     return np.maximum(np.minimum(coords, max_), min_)
 
@@ -320,7 +415,18 @@ class Graph:
                     v=np.where(self.graph[v, :])[0][0]
                     sub_graphs[-1].append(v)
         return sub_graphs
-
+class TextLineCfg:
+    SCALE=600
+    MAX_SCALE=1200
+    TEXT_PROPOSALS_WIDTH=16
+    MIN_NUM_PROPOSALS = 2
+    MIN_RATIO=0.5
+    LINE_MIN_SCORE=0.9
+    MAX_HORIZONTAL_GAP=60
+    TEXT_PROPOSALS_MIN_SCORE=0.7
+    TEXT_PROPOSALS_NMS_THRESH=0.3
+    MIN_V_OVERLAPS=0.6
+    MIN_SIZE_SIM=0.6
 
 class TextProposalGraphBuilder:
     """
@@ -352,10 +458,7 @@ class TextProposalGraphBuilder:
 
     def is_succession_node(self, index, succession_index):
         precursors=self.get_precursors(succession_index)
-        # print(precursors)
-        if precursors==[]:
-            return False
-        if self.scores[index] >= np.max(self.scores[precursors]):
+        if self.scores[index]>=np.max(self.scores[precursors]):
             return True
         return False
 
@@ -398,7 +501,6 @@ class TextProposalGraphBuilder:
                 # have equal scores.
                 graph[index, succession_index]=True
         return Graph(graph)
-
 class TextProposalConnector:
     def __init__(self):
         self.graph_builder=TextProposalGraphBuilder()
@@ -565,10 +667,10 @@ class TextProposalConnectorOriented:
         return text_recs
 
 if __name__=='__main__':
-    xmlpath='D:\py_projects\data_new\data_new\data\\annotation\\img_calligraphy_00001_bg.xml'
-    imgpath='D:\py_projects\data_new\data_new\data\\train_img\\img_calligraphy_00001_bg.jpg'
-    gtboxes,_=readxml(xmlpath)
-    img=Image.open(imgpath)
+    xmlpath = 'D:\py_projects\data_new\data_new\data\\annotation\\img_calligraphy_00001_bg.xml'
+    imgpath = 'D:\py_projects\data_new\data_new\data\\train_img\\img_calligraphy_00001_bg.jpg'
+    gtboxes, _ = readxml(xmlpath)
+    img = rotate(imgpath)
     original_size = img.size
     x_scale = 256 / original_size[0]
     y_scale = 512 / original_size[1]
@@ -580,14 +682,14 @@ if __name__=='__main__':
         )
     img = img.resize((256, 512), Image.ANTIALIAS)
     gtboxes = np.array(newbox)
-    w,h=img.size
-    [cls,regr],base_anchor=cal_rpn((w,h),(h//16,w//16),16,gtboxes,iou_positive=0.7, iou_negative=0.3,
-                                     rpn_total_num=300, rpn_positive_num=150)
-    print(cls.shape,regr.shape)
-    regr=np.expand_dims(regr,axis=0)
-    inv_anchor=bbox_trasfor_inv(base_anchor,regr,scale=16)
-    anchors=inv_anchor[cls==0]
-    anchors=anchors.astype(int)
+    w, h = img.size
+    [cls, regr], base_anchor = cal_rpn((w, h), (h // 16, w // 16), 16, gtboxes, iou_positive=0.7, iou_negative=0.3,
+                                       rpn_total_num=300, rpn_positive_num=150)
+    print(cls.shape, regr.shape)
+    regr = np.expand_dims(regr, axis=0)
+    inv_anchor = bbox_trasfor_inv(base_anchor, regr, scale=16)
+    anchors = inv_anchor[cls == 0]
+    anchors = anchors.astype(int)
     for i in anchors:
         print(i)
-    drawRect(anchors,img)
+    drawRect(anchors, img)

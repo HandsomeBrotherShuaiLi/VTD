@@ -2,6 +2,7 @@ import numpy as np
 import os
 from PIL import Image
 from Detection.CTPN_vertical.utils import cal_rpn,readxml,generate_anchors,bbox_trasfor_inv,nms
+import Detection.CTPN_vertical.CP as cp
 from Detection.CTPN_vertical.model_keras import proposal_model
 from Detection.CTPN_vertical.utils import drawRect,TextProposalConnectorOriented
 from Detection.CTPN_vertical.LineGraphy import clip_boxes
@@ -9,6 +10,27 @@ import tensorflow as tf
 import tensorflow.keras.backend as K
 import tensorflow.keras.optimizers as optimizers
 from tensorflow.keras.callbacks import ReduceLROnPlateau,ModelCheckpoint,EarlyStopping,TensorBoard
+import cv2
+from math import *
+def rotate(img_path):
+    img=cv2.imread(img_path)
+    height, width = img.shape[:2]
+
+    degree = 90
+    # 旋转后的尺寸
+    heightNew = int(width * fabs(sin(radians(degree))) + height * fabs(cos(radians(degree))))  # 这个公式参考之前内容
+    widthNew = int(height * fabs(sin(radians(degree))) + width * fabs(cos(radians(degree))))
+
+    matRotation = cv2.getRotationMatrix2D((width / 2, height / 2), degree, 1)
+
+    matRotation[0, 2] += (widthNew - width) / 2  # 因为旋转之后,坐标系原点是新图像的左上角,所以需要根据原图做转化
+    matRotation[1, 2] += (heightNew - height) / 2
+
+    imgRotation = cv2.warpAffine(img, matRotation, (widthNew, heightNew), borderValue=(255, 255, 255))
+
+    return Image.fromarray(imgRotation)
+
+
 def rpn_regr_loss(y_true,y_pred):
 
     sigma = 9.0
@@ -76,7 +98,7 @@ class DataGenerator(object):
         if self.image_shape==None:#else (w,h)
             self.batch_size=1
         self.steps_per_epoch=len(self.input_index)//self.batch_size
-    def generator(self):
+    def generator(self,turn=False):
         input_batch_imgs=[]
         batch_cls=[]
         batch_regr=[]
@@ -91,32 +113,60 @@ class DataGenerator(object):
                 gtboxes, xml_filename = readxml(os.path.join(self.label_dir,label_name))
                 if xml_filename!=img_name:
                     raise Exception('read xml error')
+                if turn:
+                    ow,oh=img.size
+                    img=rotate(os.path.join(self.image_dir,img_name))
+                    newbox=[]
+                    for i in gtboxes:
+                        newbox.append([i[1], ow - i[2], i[3], ow - i[0]])
+                    gtboxes=np.array(newbox)
+
                 if self.image_shape!=None:
-                    original_size = img.size
-                    x_scale = self.image_shape[0] / original_size[0]
-                    y_scale = self.image_shape[1] / original_size[1]
-                    newbox = []
-                    for i in range(len(gtboxes)):
-                        newbox.append(
-                            [gtboxes[i][0] * x_scale, gtboxes[i][1] * y_scale, gtboxes[i][2] * x_scale,
-                             gtboxes[i][3] * y_scale]
-                        )
-                    img = img.resize((self.image_shape[0], self.image_shape[1]), Image.ANTIALIAS)
-                    gtboxes = np.array(newbox)
-                w,h=img.size
+                   if turn==False:
+                       original_size = img.size
+                       x_scale = self.image_shape[0] / original_size[0]
+                       y_scale = self.image_shape[1] / original_size[1]
+                       newbox = []
+                       for i in range(len(gtboxes)):
+                           newbox.append(
+                               [gtboxes[i][0] * x_scale, gtboxes[i][1] * y_scale, gtboxes[i][2] * x_scale,
+                                gtboxes[i][3] * y_scale]
+                           )
+                       img = img.resize((self.image_shape[0], self.image_shape[1]), Image.ANTIALIAS)
+                       gtboxes = np.array(newbox)
+                   else:
+                       original_size = img.size
+                       self.image_shape=(self.image_shape[1],self.image_shape[0])
+                       x_scale = self.image_shape[0] / original_size[0]
+                       y_scale = self.image_shape[1] / original_size[1]
+                       newbox = []
+                       for i in range(len(gtboxes)):
+                           newbox.append(
+                               [gtboxes[i][0] * x_scale, gtboxes[i][1] * y_scale, gtboxes[i][2] * x_scale,
+                                gtboxes[i][3] * y_scale]
+                           )
+                       img = img.resize((self.image_shape[0], self.image_shape[1]), Image.ANTIALIAS)
+                       gtboxes = np.array(newbox)
 
                 if self.base_model_name=='vgg16':
                     scale=16
                 else:
                     scale=32
-                [cls,regr],_=cal_rpn(imgsize=(w,h),featuresize=(int(h/scale),int(w/scale)),
-                                     scale=scale,gtboxes=gtboxes,
-                                     iou_positive=self.iou_positive, iou_negative=self.iou_negative,
-                                     rpn_total_num=self.rpn_total_num, rpn_positive_num=self.rpn_positive_num
-                                     )
+                w, h = img.size
+                print('wh{}.{}'.format(w,h))
+                if turn==False:
+                    [cls, regr], _ = cal_rpn(imgsize=(w, h), featuresize=(int(h / scale), int(w / scale)),
+                                             scale=scale, gtboxes=gtboxes,
+                                             iou_positive=self.iou_positive, iou_negative=self.iou_negative,
+                                             rpn_total_num=self.rpn_total_num, rpn_positive_num=self.rpn_positive_num
+                                             )
 
-                img = np.array(img)
-                img = (img / 255.0) * 2.0 - 1.0
+                    img = np.array(img)
+                    img = (img / 255.0) * 2.0 - 1.0
+                else:
+                    [cls,regr],_=cp.cal_rpn((h,w), (int(h / scale), int(w / scale)), scale,gtboxes)
+                    img=np.array(img)
+                    img=img-cp.IMAGE_MEAN
                 regr = np.hstack([cls.reshape(cls.shape[0], 1), regr])
                 cls = np.expand_dims(cls, axis=0)
                 input_batch_imgs.append(img)
@@ -135,6 +185,71 @@ class DataGenerator(object):
                     batch_regr = []
                     batch_count = 0
             np.random.shuffle(self.input_index)
+    def generator_V2(self):
+        input_batch_imgs=[]
+        batch_cls=[]
+        batch_regr=[]
+        batch_count = 0
+        all_image_name=os.listdir(self.image_dir)
+        while True:
+
+            for i in self.input_index:
+                img_name=all_image_name[i]
+                label_name=img_name.replace('.jpg','.xml')
+                img=Image.open(os.path.join(self.image_dir,img_name))
+                gtboxes, xml_filename = readxml(os.path.join(self.label_dir,label_name))
+                if xml_filename!=img_name:
+                    raise Exception('read xml error')
+                ow, oh = img.size
+                print('ratate前 {} {}'.format(ow,oh))
+                img = rotate(os.path.join(self.image_dir, img_name))
+                print('ratate 后 {} {}'.format(img.size[0], img.size[1]))
+                newbox = []
+                for i in gtboxes:
+                    newbox.append([i[1], ow - i[2], i[3], ow - i[0]])
+                gtboxes = np.array(newbox)
+
+                if self.image_shape!=None:
+                       original_size = img.size
+                       x_scale = self.image_shape[1] / original_size[0]
+                       y_scale = self.image_shape[0] / original_size[1]
+                       newbox = []
+                       for i in range(len(gtboxes)):
+                           newbox.append(
+                               [gtboxes[i][0] * x_scale, gtboxes[i][1] * y_scale, gtboxes[i][2] * x_scale,
+                                gtboxes[i][3] * y_scale]
+                           )
+                       img = img.resize((self.image_shape[1], self.image_shape[0]), Image.ANTIALIAS)
+                       gtboxes = np.array(newbox)
+
+                if self.base_model_name=='vgg16':
+                    scale=16
+                else:
+                    scale=32
+                w, h = img.size
+                print('wh{}.{}'.format(w,h))
+                [cls, regr], _ = cp.cal_rpn((h, w), (int(h / scale), int(w / scale)), scale, gtboxes)
+                img = np.array(img)
+                img = img - cp.IMAGE_MEAN
+                regr = np.hstack([cls.reshape(cls.shape[0], 1), regr])
+                cls = np.expand_dims(cls, axis=0)
+                input_batch_imgs.append(img)
+                batch_cls.append(cls)
+                batch_regr.append(regr)
+                batch_count+=1
+                if batch_count>=self.batch_size:
+                    input_imgs=np.array(input_batch_imgs)
+                    np_batch_cls=np.array(batch_cls)
+                    np_batch_regr=np.array(batch_regr)
+
+                    yield input_imgs,{'rpn_class_finnal':np_batch_cls,'rpn_regr_finnal':np_batch_regr}
+
+                    input_batch_imgs = []
+                    batch_cls = []
+                    batch_regr = []
+                    batch_count = 0
+            np.random.shuffle(self.input_index)
+
 
 class ctpn_tf_model(object):
     def __init__(self,img_dir,label_dir,version,optimizer,lr,ck_dir,log_dir,image_shape=None,k=10,val_size=2000, base_model_name='vgg16',epoch=100,initial_epoch=0,
@@ -210,7 +325,7 @@ class ctpn_tf_model(object):
                                 iou_negative=self.iou_negative,iou_positive=self.iou_positive,
                                 base_model_name=self.base_model_name,rpn_total_num=self.rpn_total_num,
                                 rpn_positive_num=self.rpn_positive_num)
-        shape=(None,None,3) if self.img_shape==None else (self.img_shape[1],self.img_shape[0],self.img_shape[2])
+        shape=(None,None,3) if self.img_shape==None else (self.img_shape[0],self.img_shape[1],self.img_shape[2])
         self.train_model,self.predict_model=proposal_model(base_model_name=self.base_model_name,k=self.k,
                                                            trained_weight=self.trained_weight,
                                                            image_shape=shape,
@@ -242,9 +357,9 @@ class ctpn_tf_model(object):
         if self.trained_weight!=None:
             self.train_model.load_weights(self.trained_weight)
         his=self.train_model.fit_generator(
-            generator=train_gen.generator(),
+            generator=train_gen.generator_V2(),
             steps_per_epoch=train_gen.steps_per_epoch,
-            validation_data=val_gen.generator(),
+            validation_data=val_gen.generator_V2(),
             validation_steps=val_gen.steps_per_epoch,
             epochs=self.epoch,
             initial_epoch=self.initial_epoch,
@@ -314,32 +429,26 @@ class ctpn_tf_model(object):
             select_anchor=bbox[fg,:]
             select_score=cls_prob[0,fg,0]
             select_anchor=select_anchor.astype('int32')
-
-
             #filter box
-            # keep_index=filter_bbox(select_anchor,scale)
-            # select_anchor=select_anchor[keep_index]
-            # select_score=select_score[keep_index]
+            keep_index=cp.filter_bbox(select_anchor,scale)
+            select_anchor=select_anchor[keep_index]
+            select_score=select_score[keep_index]
 
             select_score=np.reshape(select_score,(select_score.shape[0],1))
             nmsbox=np.hstack((select_anchor,select_score))
             keep=nms(nmsbox,1-self.iou_select)
             select_anchor=select_anchor[keep]
             select_score=select_score[keep]
-            textConn = TextProposalConnectorOriented()
+            textConn = cp.TextProposalConnectorOriented()
             text = textConn.get_text_lines(select_anchor, select_score, [h, w])
-            drawRect(text,img_pil)
-
-
-
-
-
+            drawRect(select_anchor,img_pil)
+            break
 
 if __name__=='__main__':
    m=ctpn_tf_model(
        img_dir='D:\py_projects\data_new\data_new\data\\train_img',
        label_dir='D:\py_projects\data_new\data_new\data\\annotation',
-       version='keras_ctpn_v1',
+       version='keras_ctpn_v3_turn',
        optimizer='sgd',
        log_dir='D:\py_projects\VTD\logs',
        ck_dir='D:\py_projects\VTD\model',
@@ -349,5 +458,4 @@ if __name__=='__main__':
        val_bs=5,
        lr=0.001
    )
-   m.predict(dir='D:\py_projects\data_new\data_new\data\\test_img',resize=True,
-             predict_model_path='D:\py_projects\VTD\model\keras_ctpn_v1\ctpn-keras--14--0.05821.hdf5')
+   m.train()
