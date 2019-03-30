@@ -93,7 +93,7 @@ def cal_overlaps(boxes1,boxes2):
         overlaps[i][:]=cal_iou(boxes1[i],area1[i],boxes2,area2)
     return overlaps
 
-def cal_rpn(imgsize,featuresize,scale,gtboxes,iou_positive,iou_negative,rpn_positive_num,rpn_total_num):
+def cal_rpn(imgsize,featuresize,scale,gtboxes,iou_positive=0.7,iou_negative=0.3,rpn_positive_num=150,rpn_total_num=300):
     #使用PIL,img size 是（w,h)
     imgw,imgh=imgsize
     base_anchors=generate_anchors(featuresize,scale)

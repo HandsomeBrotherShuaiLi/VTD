@@ -20,12 +20,11 @@ RPN_TOTAL_NUM = 300
 IMAGE_MEAN = [123.68, 116.779, 103.939]
 
 DEBUG = True
-def rotate(img_path):
+def rotate(img_path,degree=90):
 
     img=cv2.imread(img_path)
     height, width = img.shape[:2]
 
-    degree = 90
     # 旋转后的尺寸
     heightNew = int(width * fabs(sin(radians(degree))) + height * fabs(cos(radians(degree))))  # 这个公式参考之前内容
     widthNew = int(height * fabs(sin(radians(degree))) + width * fabs(cos(radians(degree))))
@@ -224,6 +223,9 @@ def cal_rpn(imgsize, featuresize, scale, gtboxes):
     # the anchor with the highest IOU overlap with a GT box
     anchor_argmax_overlaps = overlaps.argmax(axis=1)  # (Nsample, )
     anchor_max_overlaps = overlaps[range(overlaps.shape[0]), anchor_argmax_overlaps]  # (Nsample, )
+    # print('anchor max overlaps')
+    # for i in anchor_max_overlaps:
+    #     print(i)
 
     # IOU > IOU_POSITIVE
     labels[anchor_max_overlaps > IOU_POSITIVE] = 1
@@ -231,6 +233,9 @@ def cal_rpn(imgsize, featuresize, scale, gtboxes):
     labels[anchor_max_overlaps < IOU_NEGATIVE] = 0
     # ensure that every GT box has at least one positive RPN region
     labels[gt_argmax_overlaps] = 1
+    # print('内部的label',labels)
+    # for i in labels:
+    #     print(i)
 
     # only keep anchors inside the image
     outside_anchor = np.where(
@@ -667,29 +672,35 @@ class TextProposalConnectorOriented:
         return text_recs
 
 if __name__=='__main__':
-    xmlpath = 'D:\py_projects\data_new\data_new\data\\annotation\\img_calligraphy_00001_bg.xml'
-    imgpath = 'D:\py_projects\data_new\data_new\data\\train_img\\img_calligraphy_00001_bg.jpg'
+    xmlpath = 'D:\py_projects\data_new\data_new\data\\annotation\\img_calligraphy_00003_bg.xml'
+    imgpath = 'D:\py_projects\data_new\data_new\data\\train_img\\img_calligraphy_00003_bg.jpg'
     gtboxes, _ = readxml(xmlpath)
-    img = rotate(imgpath)
-    original_size = img.size
-    x_scale = 256 / original_size[0]
-    y_scale = 512 / original_size[1]
+    img = rotate(imgpath,90)
+    print(gtboxes)
+    ow,oh=img.size
+    newbox = []
+    for i in gtboxes:
+        newbox.append([i[1], ow - i[2], i[3], ow - i[0]])
+    gtboxes = np.array(newbox)
+    image_shape = (512,256)
+    x_scale = image_shape[0] / ow
+    y_scale = image_shape[1] / oh
     newbox = []
     for i in range(len(gtboxes)):
         newbox.append(
             [gtboxes[i][0] * x_scale, gtboxes[i][1] * y_scale, gtboxes[i][2] * x_scale,
              gtboxes[i][3] * y_scale]
         )
-    img = img.resize((256, 512), Image.ANTIALIAS)
+    img = img.resize(image_shape, Image.ANTIALIAS)
     gtboxes = np.array(newbox)
-    w, h = img.size
-    [cls, regr], base_anchor = cal_rpn((w, h), (h // 16, w // 16), 16, gtboxes, iou_positive=0.7, iou_negative=0.3,
-                                       rpn_total_num=300, rpn_positive_num=150)
-    print(cls.shape, regr.shape)
-    regr = np.expand_dims(regr, axis=0)
-    inv_anchor = bbox_trasfor_inv(base_anchor, regr, scale=16)
-    anchors = inv_anchor[cls == 0]
-    anchors = anchors.astype(int)
-    for i in anchors:
-        print(i)
-    drawRect(anchors, img)
+    print(gtboxes)
+    [cls,regr],base_anchor=cal_rpn((256,512),(256//16,512//16),16,gtboxes)
+    print(cls)
+    regr=np.expand_dims(regr,axis=0)
+    anchor=bbox_transfor_inv(base_anchor,regr)
+    anchor=anchor[cls==1]
+    anchor=anchor.astype(int)
+    print(anchor)
+    drawRect(anchor,img)
+
+

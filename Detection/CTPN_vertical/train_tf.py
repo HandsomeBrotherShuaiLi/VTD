@@ -12,11 +12,10 @@ import tensorflow.keras.optimizers as optimizers
 from tensorflow.keras.callbacks import ReduceLROnPlateau,ModelCheckpoint,EarlyStopping,TensorBoard
 import cv2
 from math import *
-def rotate(img_path):
+def rotate(img_path,degree):
     img=cv2.imread(img_path)
     height, width = img.shape[:2]
 
-    degree = 90
     # 旋转后的尺寸
     heightNew = int(width * fabs(sin(radians(degree))) + height * fabs(cos(radians(degree))))  # 这个公式参考之前内容
     widthNew = int(height * fabs(sin(radians(degree))) + width * fabs(cos(radians(degree))))
@@ -115,7 +114,7 @@ class DataGenerator(object):
                     raise Exception('read xml error')
                 if turn:
                     ow,oh=img.size
-                    img=rotate(os.path.join(self.image_dir,img_name))
+                    img=rotate(os.path.join(self.image_dir,img_name),degree=90)
                     newbox=[]
                     for i in gtboxes:
                         newbox.append([i[1], ow - i[2], i[3], ow - i[0]])
@@ -202,7 +201,7 @@ class DataGenerator(object):
                     raise Exception('read xml error')
                 ow, oh = img.size
                 # print('ratate前 {} {}'.format(ow,oh))
-                img = rotate(os.path.join(self.image_dir, img_name))
+                img = rotate(os.path.join(self.image_dir, img_name),degree=90)
                 # print('ratate 后 {} {}'.format(img.size[0], img.size[1]))
                 newbox = []
                 for i in gtboxes:
@@ -330,7 +329,7 @@ class ctpn_tf_model(object):
                                                            trained_weight=self.trained_weight,
                                                            image_shape=shape,
                                                            bs=self.train_bs
-                                                           ).model_ctpn()
+                                                           ).model_ctpn_v2()
         if self.optimizer.lower()=='adam':
             opt=optimizers.Adam(self.lr)
         elif self.optimizer.lower()=='sgd':
@@ -380,7 +379,7 @@ class ctpn_tf_model(object):
                                                               trained_weight=self.trained_weight,
                                                               image_shape=shape,
                                                               bs=1
-                                                              ).model_ctpn()
+                                                              ).model_ctpn_v2()
         predict_model.load_weights(predict_model_path)
         if self.base_model_name=='vgg16':
             scale=16
@@ -397,7 +396,7 @@ class ctpn_tf_model(object):
             img=Image.open(img_path)
             origin_w,origin_h=img.size
             if turn:
-                img=rotate(img_path)
+                img=rotate(img_path,degree=90)
             w,h=origin_w,origin_h
             if resize:
                 img=img.resize((self.img_shape[1], self.img_shape[0]), Image.ANTIALIAS)
@@ -442,8 +441,12 @@ class ctpn_tf_model(object):
             textConn = cp.TextProposalConnectorOriented()
             text = textConn.get_text_lines(select_anchor, select_score, [h, w])
             text=text.astype(int)
+            # t=[]
+            # for i in text:
+            #     t.append([i[1], 256 - i[2], i[3], 256 - i[0]])
             drawRect(text,img_pil)
-            break
+            # drawRect(t,img_pil)
+            # del img_pil
 
 if __name__=='__main__':
    m=ctpn_tf_model(
@@ -460,6 +463,8 @@ if __name__=='__main__':
        lr=0.001
    )
    m.train()
+   # m.predict(predict_model_path='D:\py_projects\VTD\model\keras_ctpn_v1\ctpn-keras--14--0.05821.hdf5',
+   #           turn=True,resize=True,dir='D:\py_projects\data_new\data_new\data\\test_img')
    # m = ctpn_tf_model(
    #     img_dir='D:\python_projects\data_new\data\\train_img',
    #     label_dir='D:\python_projects\data_new\data\\annotation',
