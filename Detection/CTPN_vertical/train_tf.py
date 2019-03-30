@@ -201,9 +201,9 @@ class DataGenerator(object):
                 if xml_filename!=img_name:
                     raise Exception('read xml error')
                 ow, oh = img.size
-                print('ratate前 {} {}'.format(ow,oh))
+                # print('ratate前 {} {}'.format(ow,oh))
                 img = rotate(os.path.join(self.image_dir, img_name))
-                print('ratate 后 {} {}'.format(img.size[0], img.size[1]))
+                # print('ratate 后 {} {}'.format(img.size[0], img.size[1]))
                 newbox = []
                 for i in gtboxes:
                     newbox.append([i[1], ow - i[2], i[3], ow - i[0]])
@@ -227,7 +227,7 @@ class DataGenerator(object):
                 else:
                     scale=32
                 w, h = img.size
-                print('wh{}.{}'.format(w,h))
+                # print('wh{}.{}'.format(w,h))
                 [cls, regr], _ = cp.cal_rpn((h, w), (int(h / scale), int(w / scale)), scale, gtboxes)
                 img = np.array(img)
                 img = img - cp.IMAGE_MEAN
@@ -367,7 +367,7 @@ class ctpn_tf_model(object):
         )
         print(his)
 
-    def predict(self,dir,predict_model_path,resize=False,mode=1):
+    def predict(self,dir,predict_model_path,resize=False,turn=True,mode=1):
         """
 
         :param dir:a dir or a image path
@@ -375,7 +375,7 @@ class ctpn_tf_model(object):
         :param mode:1:show image,  2 return predict result
         :return:
         """
-        shape = (None, None, 3) if self.img_shape == None else (self.img_shape[1], self.img_shape[0], self.img_shape[2])
+        shape = (None, None, 3) if self.img_shape == None else (self.img_shape[0], self.img_shape[1], self.img_shape[2])
         train_model, predict_model = proposal_model(base_model_name=self.base_model_name, k=self.k,
                                                               trained_weight=self.trained_weight,
                                                               image_shape=shape,
@@ -395,52 +395,53 @@ class ctpn_tf_model(object):
         radios=[]
         for img_path in img_list:
             img=Image.open(img_path)
-
-            # print(img_path)
             origin_w,origin_h=img.size
+            if turn:
+                img=rotate(img_path)
             w,h=origin_w,origin_h
             if resize:
-                img=img.resize((self.img_shape[0], self.img_shape[1]), Image.ANTIALIAS)
-                x_radio,y_radio=self.img_shape[0]/origin_w,self.img_shape[1]/origin_h
+                img=img.resize((self.img_shape[1], self.img_shape[0]), Image.ANTIALIAS)
+                x_radio,y_radio=self.img_shape[1]/img.size[0],self.img_shape[0]/img.size[1]
                 radios.append([x_radio,y_radio])
-                w,h=self.img_shape[0],self.img_shape[1]
+                w,h=self.img_shape[1],self.img_shape[0]
             else:
-                if origin_w<16 and origin_h<16:
-                    img=img.resize((16,32),Image.ANTIALIAS)
-                    origin_w,origin_h=16,32
+                if origin_w<scale and origin_h<scale:
+                    img=img.resize((scale,scale),Image.ANTIALIAS)
+                    origin_w,origin_h=(scale,scale)
                     w,h=origin_w,origin_h
             original_shape_list.append([origin_w, origin_h])
             img_pil=img
             img = np.array(img)
-            img = (img / 255.0) * 2.0 - 1.0
+            if turn:
+                img = img - cp.IMAGE_MEAN
+            else:
+                img=(img / 255.0) * 2.0 - 1.0
             img=np.expand_dims(img,axis=0)
             cls,regr,cls_prob=predict_model.predict(img)
 
-            if resize:
-                anchors=generate_anchors(featuremap_size=(int(self.img_shape[1]/scale),int(self.img_shape[0]/scale)),
-                                         scale=scale,kmeans=False)
-            else:
-                anchors=generate_anchors(featuremap_size=(int(origin_h/scale),int(origin_w/scale)),
-                                         scale=scale,kmeans=False)
-            bbox=bbox_trasfor_inv(anchors,regr,scale)
+            anchors = cp.gen_anchor((h // scale, w // scale), scale)
 
-            fg=np.where(cls_prob[0,:,0]>self.iou_select)[0]
+            bbox=cp.bbox_transfor_inv(anchors,regr)
+
+            fg=np.where(cls_prob[0,:,1]>self.iou_select)[0]
 
             select_anchor=bbox[fg,:]
-            select_score=cls_prob[0,fg,0]
+            select_score=cls_prob[0,fg,1]
             select_anchor=select_anchor.astype('int32')
             #filter box
             keep_index=cp.filter_bbox(select_anchor,scale)
+
             select_anchor=select_anchor[keep_index]
             select_score=select_score[keep_index]
 
             select_score=np.reshape(select_score,(select_score.shape[0],1))
             nmsbox=np.hstack((select_anchor,select_score))
-            keep=nms(nmsbox,1-self.iou_select)
+            keep=cp.nms(nmsbox,1-self.iou_select)
             select_anchor=select_anchor[keep]
             select_score=select_score[keep]
             textConn = cp.TextProposalConnectorOriented()
             text = textConn.get_text_lines(select_anchor, select_score, [h, w])
+            text=text.astype(int)
             drawRect(select_anchor,img_pil)
             break
 
