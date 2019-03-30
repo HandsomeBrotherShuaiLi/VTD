@@ -459,3 +459,18 @@ if __name__=='__main__':
        lr=0.001
    )
    m.train()
+   # m = ctpn_tf_model(
+   #     img_dir='D:\python_projects\data_new\data\\train_img',
+   #     label_dir='D:\python_projects\data_new\data\\annotation',
+   #     version='keras_ctpn_sgd_top_ramdon',
+   #     optimizer='sgd',
+   #     log_dir='D:\\vertical_text_detection\logs',
+   #     ck_dir='D:\\vertical_text_detection\model',
+   #     image_shape=(256, 512, 3),
+   #     initial_epoch=0,
+   #     train_bs=20,
+   #     val_bs=20,
+   #     lr=0.001,
+   #     # trained_weight='D:\\vertical_text_detection\model\keras_ctpn_adam\ctpn-keras--05--0.47603.hdf5'
+   # )
+   # m.train()
