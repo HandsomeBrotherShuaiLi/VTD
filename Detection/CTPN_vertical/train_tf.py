@@ -367,7 +367,7 @@ class ctpn_tf_model(object):
         )
         print(his)
 
-    def predict(self,dir,predict_model_path,resize=False,turn=True,mode=1):
+    def predict(self,dir,predict_model_path,resize=True,turn=True,mode=1):
         """
 
         :param dir:a dir or a image path
@@ -442,7 +442,7 @@ class ctpn_tf_model(object):
             textConn = cp.TextProposalConnectorOriented()
             text = textConn.get_text_lines(select_anchor, select_score, [h, w])
             text=text.astype(int)
-            drawRect(select_anchor,img_pil)
+            drawRect(text,img_pil)
             break
 
 if __name__=='__main__':
