@@ -441,12 +441,10 @@ class ctpn_tf_model(object):
             textConn = cp.TextProposalConnectorOriented()
             text = textConn.get_text_lines(select_anchor, select_score, [h, w])
             text=text.astype(int)
-            # t=[]
-            # for i in text:
-            #     t.append([i[1], 256 - i[2], i[3], 256 - i[0]])
+            print(img_pil.size)
+            print(text)
+            print('*'*90)
             drawRect(text,img_pil)
-            # drawRect(t,img_pil)
-            # del img_pil
 
 if __name__=='__main__':
    m=ctpn_tf_model(
@@ -462,7 +460,10 @@ if __name__=='__main__':
        val_bs=5,
        lr=0.001
    )
-   m.train()
+   m.predict(
+       predict_model_path='D:\py_projects\VTD\model\keras_ctpn_v3_turn\ctpn-keras--11--0.13348.hdf5',
+       turn=True,resize=True,dir='D:\py_projects\data_new\data_new\data\\test_img'
+   )
    # m.predict(predict_model_path='D:\py_projects\VTD\model\keras_ctpn_v1\ctpn-keras--14--0.05821.hdf5',
    #           turn=True,resize=True,dir='D:\py_projects\data_new\data_new\data\\test_img')
    # m = ctpn_tf_model(

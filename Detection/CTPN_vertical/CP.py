@@ -223,9 +223,10 @@ def cal_rpn(imgsize, featuresize, scale, gtboxes):
     # the anchor with the highest IOU overlap with a GT box
     anchor_argmax_overlaps = overlaps.argmax(axis=1)  # (Nsample, )
     anchor_max_overlaps = overlaps[range(overlaps.shape[0]), anchor_argmax_overlaps]  # (Nsample, )
-    # print('anchor max overlaps')
-    # for i in anchor_max_overlaps:
-    #     print(i)
+    print('anchor max overlaps')
+    for i in anchor_max_overlaps:
+        if i>IOU_POSITIVE:
+            print(i)
 
     # IOU > IOU_POSITIVE
     labels[anchor_max_overlaps > IOU_POSITIVE] = 1
