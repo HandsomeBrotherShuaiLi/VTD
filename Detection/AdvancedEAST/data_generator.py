@@ -15,9 +15,11 @@ def gen(batch_size=cfg.batch_size, is_val=False):
     if is_val:
         with open(os.path.join(cfg.data_dir, cfg.val_fname), 'r') as f_val:
             f_list = f_val.readlines()
+            print('val len is {}'.format(len(f_list)))
     else:
         with open(os.path.join(cfg.data_dir, cfg.train_fname), 'r') as f_train:
             f_list = f_train.readlines()
+            print('train len is {}'.format(len(f_list)))
     while True:
         for i in range(batch_size):
             # random gen an image name

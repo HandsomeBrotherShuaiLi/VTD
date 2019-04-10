@@ -60,10 +60,10 @@ if not os.path.exists('model'):
 if not os.path.exists('saved_model'):
     os.mkdir('saved_model')
 
-model_weights_path = 'model/weights_%s.{epoch:03d}-{val_loss:.3f}.h5' \
+model_weights_path = 'D:\py_projects\VTD\model\east_model\epoch_weights\weights_%s.{epoch:03d}-{val_loss:.5f}.h5' \
                      % train_task_id
-saved_model_file_path = 'saved_model/east_model_%s.h5' % train_task_id
-saved_model_weights_file_path = 'saved_model/east_model_weights_%s.h5'\
+saved_model_file_path = 'D:\py_projects\VTD\model\east_model\saved_model\east_model_%s.h5' % train_task_id
+saved_model_weights_file_path = 'D:\py_projects\VTD\model\east_model\saved_model\east_model_weights_%s.h5'\
                                 % train_task_id
 #pixel_threshold = 0.9
 pixel_threshold = 0.7
