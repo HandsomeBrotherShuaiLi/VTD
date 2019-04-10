@@ -461,7 +461,7 @@ if __name__=='__main__':
        lr=0.001
    )
    m.predict(
-       predict_model_path='D:\py_projects\VTD\model\keras_ctpn_v3_turn\ctpn-keras--11--0.13348.hdf5',
+       predict_model_path='D:\py_projects\VTD\model\keras_ctpn_v1\ctpn-keras--14--0.05821.hdf5',
        turn=True,resize=True,dir='D:\py_projects\data_new\data_new\data\\test_img'
    )
    # m.predict(predict_model_path='D:\py_projects\VTD\model\keras_ctpn_v1\ctpn-keras--14--0.05821.hdf5',

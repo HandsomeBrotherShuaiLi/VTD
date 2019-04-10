@@ -64,13 +64,10 @@ class East:
         before_output = self.g(cfg.feature_layers_num)
         inside_score = Conv2D(1, 1, padding='same', name='inside_score'
                               )(before_output)
-        side_v_code = Conv2D(2, 1, padding='same', name='side_vertex_code'
-                             )(before_output)
         side_v_coord = Conv2D(4, 1, padding='same', name='side_vertex_coord'
                               )(before_output)
         east_detect = Concatenate(axis=-1,
                                   name='east_detect')([inside_score,
-                                                       side_v_code,
                                                        side_v_coord])
         return Model(inputs=self.input_img, outputs=east_detect)
 

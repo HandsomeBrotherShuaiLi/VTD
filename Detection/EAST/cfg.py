@@ -53,6 +53,7 @@ feature_layers_range = range(5, 1, -1)
 feature_layers_num = len(feature_layers_range)
 # pixel_size = 4
 pixel_size = 2 ** feature_layers_range[-1]
+
 locked_layers = False
 
 if not os.path.exists('model'):
