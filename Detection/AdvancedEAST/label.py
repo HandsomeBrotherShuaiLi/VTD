@@ -102,14 +102,14 @@ def process_label(data_dir=cfg.data_dir):
     with open(os.path.join(data_dir, cfg.train_fname), 'r') as f_train:
         f_list.extend(f_train.readlines())
     for line, _ in zip(f_list, tqdm(range(len(f_list)))):
-        line_cols = str(line).strip().split(',')
+        line_cols = str(line).strip('\n').split(',')
         img_name, width, height = \
             line_cols[0].strip(), int(line_cols[1].strip()), \
             int(line_cols[2].strip())
         gt = np.zeros((height // cfg.pixel_size, width // cfg.pixel_size, 7))
         train_label_dir = os.path.join(data_dir, cfg.train_label_dir_name)
         xy_list_array = np.load(os.path.join(train_label_dir,
-                                             img_name[:-4] + '.npy'))
+                                             img_name.replace('.jpg','.npy')))
         train_image_dir = os.path.join(data_dir, cfg.train_image_dir_name)
         with Image.open(os.path.join(train_image_dir, img_name)) as im:
             draw = ImageDraw.Draw(im)
@@ -167,7 +167,7 @@ def process_label(data_dir=cfg.data_dir):
                 im.save(os.path.join(act_image_dir, img_name))
         train_label_dir = os.path.join(data_dir, cfg.train_label_dir_name)
         np.save(os.path.join(train_label_dir,
-                             img_name[:-4] + '_gt.npy'), gt)
+                             img_name.replace('.jpg', '_gt.npy')), gt)
 
 
 if __name__ == '__main__':

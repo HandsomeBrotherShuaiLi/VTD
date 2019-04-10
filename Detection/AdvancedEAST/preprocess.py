@@ -82,8 +82,31 @@ def resize_image(im, max_img_size=cfg.max_train_img_size):
     d_wight = o_width - (o_width % 32)
     d_height = o_height - (o_height % 32)
     return d_wight, d_height
-
-
+def gen_txt():
+    import pandas as pd
+    f=cfg.csv_path
+    fp=pd.read_csv(f)
+    all_images_name=os.listdir(os.path.join(cfg.data_dir,cfg.origin_image_dir_name))
+    txt_dir=os.path.join(cfg.data_dir,cfg.origin_txt_dir_name)
+    fail=[]
+    if not os.path.exists(txt_dir):
+        os.mkdir(txt_dir)
+    for i in all_images_name:
+    #     print(i[:-4])
+        temp=fp[fp.FileName==i]
+        if len(temp)==0:
+            print(i+' cannot find')
+            fail.append(i)
+        else:
+            t=open(os.path.join(txt_dir,i.replace('.jpg','.txt')),'w',encoding='utf-8')
+            zz=str()
+            for n in temp.index:
+                res=temp.loc[n,'x1':'text']
+                zz+=','.join([str(s) for s in res])
+                zz+='\n'
+            t.write(zz)
+            print(i+' done!')
+    print(fail)
 def preprocess():
     data_dir = cfg.data_dir
     origin_image_dir = os.path.join(data_dir, cfg.origin_image_dir_name)
@@ -120,14 +143,14 @@ def preprocess():
             # draw on the img
             draw = ImageDraw.Draw(show_gt_im)
             with open(os.path.join(origin_txt_dir,
-                                   o_img_fname[:-4] + '.txt'), 'r') as f:
+                                   o_img_fname.replace('.jpg','.txt')), 'r',encoding='utf-8') as f:
                 #每一张图对应的8个坐标位置以及文本
                 anno_list = f.readlines()
             #每一张图片对应有n个，4*2的数组，4个坐标，x,y
             xy_list_array = np.zeros((len(anno_list), 4, 2))
             for anno, i in zip(anno_list, range(len(anno_list))):
                 #list的前8个是坐标，最后一个是文本
-                anno_colums = anno.strip().split(',')
+                anno_colums = anno.strip('\n').split(',')
                 anno_array = np.array(anno_colums)
                 #8个坐标，变成4*2
                 xy_list = np.reshape(anno_array[:8].astype(float), (4, 2))
@@ -166,13 +189,14 @@ def preprocess():
                 im.save(os.path.join(train_image_dir, o_img_fname))
             np.save(os.path.join(
                 train_label_dir,
-                o_img_fname[:-4] + '.npy'),
+                o_img_fname.replace('.jpg','.npy')),
                 xy_list_array)
             if draw_gt_quad:
                 show_gt_im.save(os.path.join(show_gt_image_dir, o_img_fname))
             train_val_set.append('{},{},{}\n'.format(o_img_fname,
                                                      d_wight,
                                                      d_height))
+            # print(o_img_fname+' DONE!')
 
     train_img_list = os.listdir(train_image_dir)
     print('found %d train images.' % len(train_img_list))
@@ -188,4 +212,5 @@ def preprocess():
 
 
 if __name__ == '__main__':
-    preprocess()
+    gen_txt()
+    # preprocess()

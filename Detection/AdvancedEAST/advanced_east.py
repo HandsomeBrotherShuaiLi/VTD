@@ -1,5 +1,5 @@
 import os
-from keras.callbacks import EarlyStopping, ModelCheckpoint
+from keras.callbacks import EarlyStopping, ModelCheckpoint,TensorBoard,ReduceLROnPlateau
 from keras.optimizers import Adam
 
 from Detection.AdvancedEAST import cfg
