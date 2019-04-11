@@ -122,7 +122,13 @@ class Detection:
             for img_name in os.listdir(img_dir):
                 if img_name.endswith('_bg.jpg'):
                     img_path = os.path.join(img_dir, img_name)
-                    predict_new(model,img_path,cfg.pixel_threshold,predict_img_dir,predict_geo_txt_dir)
+                    try:
+                        f=predict_new(model, img_name, img_path, cfg.pixel_threshold, predict_img_dir,
+                                    predict_geo_txt_dir)
+                        with open('fail_imgs.txt','w',encoding='utf-8') as F:
+                            F.write('\n'.join(f))
+                    except Exception as e:
+                        print(e)
 
 if __name__=='__main__':
     d = Detection(
