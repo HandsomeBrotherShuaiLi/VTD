@@ -63,7 +63,7 @@ class Detection:
                 img,gt_file=process_label_single_image(img_filename)
                 img=np.array(img)
                 x[count] = preprocess_input(img, mode='tf')
-                y[count] = np.load(gt_file)
+                y[count] = gt_file
                 count += 1
                 if count >= cfg.batch_size:
                     yield x, y
