@@ -7,6 +7,7 @@ from Detection.AdvancedEAST.losses import quad_loss
 from Detection.AdvancedEAST.data_generator import gen,gen_plus
 import numpy as np,os
 from keras.applications.vgg16 import preprocess_input
+from Detection.AdvancedEAST.predict import predict_new
 class Detection:
     def __init__(self,computer_id,img_size,opt='adam'):
         assert computer_id in ['nio','youhua','jia']
@@ -107,9 +108,25 @@ class Detection:
         east_network.save(cfg.saved_model_file_path)
         east_network.save_weights(cfg.saved_model_weights_file_path)
 
+    def predict(self,predict_weight_path,mode=1):
+        img_dir=os.path.join(cfg.data_dir,'test_img')
+        predict_geo_txt_dir=os.path.join(cfg.data_dir,'predict_geo_txt')
+        predict_img_dir=os.path.join(cfg.data_dir,'predict_img_dir')
+        if not os.path.exists(predict_geo_txt_dir):
+            os.mkdir(predict_geo_txt_dir)
+        if not os.path.exists(predict_img_dir):
+            os.mkdir(predict_img_dir)
+        model=East().east_network()
+        model.load_weights(predict_weight_path)
+        if mode==1:
+            for img_name in os.listdir(img_dir):
+                if img_name.endswith('_bg.jpg'):
+                    img_path = os.path.join(img_dir, img_name)
+                    predict_new(model,img_path,cfg.pixel_threshold,predict_img_dir,predict_geo_txt_dir)
+
 if __name__=='__main__':
     d = Detection(
         computer_id='nio',
         img_size=384
     )
-    d.train(weights_path='D:\py_projects\VTD\model\east_model\epoch_weights\weights_SIZE256.007-0.17356.h5')
+    d.predict(predict_weight_path='D:\py_projects\VTD\model\east_model\saved_model\adam_east_model_SIZE256.h5')
