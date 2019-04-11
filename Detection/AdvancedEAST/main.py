@@ -129,4 +129,4 @@ if __name__=='__main__':
         computer_id='nio',
         img_size=384
     )
-    d.predict(predict_weight_path='D:\py_projects\VTD\model\east_model\saved_model\adam_east_model_SIZE256.h5')
+    d.predict(predict_weight_path='D:\py_projects\VTD\model\east_model\saved_model\\adam_east_model_SIZE256.h5')
