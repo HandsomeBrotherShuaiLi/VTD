@@ -113,10 +113,3 @@ if __name__=='__main__':
         img_size=384
     )
     d.train(weights_path='D:\py_projects\VTD\model\east_model\epoch_weights\weights_SIZE256.007-0.17356.h5')
-
-
-
-
-
-
-
