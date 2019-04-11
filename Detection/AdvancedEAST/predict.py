@@ -80,7 +80,7 @@ def predict(east_detect, img_path, pixel_threshold, quiet=True):
                                 tuple(geo[1]),
                                 tuple(geo[2]),
                                 tuple(geo[3]),
-                                tuple(geo[0])], width=2, fill='red')
+                                tuple(geo[0])], width=1, fill='red')
                 if cfg.predict_cut_text_line:
                     cut_text_line(geo, scale_ratio_w, scale_ratio_h, im_array,
                                   img_path, s)
