@@ -5,8 +5,56 @@ import random
 from tqdm import tqdm
 
 from Detection.AdvancedEAST import cfg
-from Detection.AdvancedEAST.label import shrink
+def shrink(xy_list, ratio=cfg.shrink_ratio):
+    if ratio == 0.0:
+        return xy_list, xy_list
+    diff_1to3 = xy_list[:3, :] - xy_list[1:4, :]
+    diff_4 = xy_list[3:4, :] - xy_list[0:1, :]
+    diff = np.concatenate((diff_1to3, diff_4), axis=0)
+    dis = np.sqrt(np.sum(np.square(diff), axis=-1))
+    # determine which are long or short edges
+    long_edge = int(np.argmax(np.sum(np.reshape(dis, (2, 2)), axis=0)))
+    short_edge = 1 - long_edge
+    # cal r length array
+    r = [np.minimum(dis[i], dis[(i + 1) % 4]) for i in range(4)]
+    # cal theta array
+    diff_abs = np.abs(diff)
+    diff_abs[:, 0] += cfg.epsilon
+    theta = np.arctan(diff_abs[:, 1] / diff_abs[:, 0])
+    # shrink two long edges
+    temp_new_xy_list = np.copy(xy_list)
+    shrink_edge(xy_list, temp_new_xy_list, long_edge, r, theta, ratio)
+    shrink_edge(xy_list, temp_new_xy_list, long_edge + 2, r, theta, ratio)
+    # shrink two short edges
+    new_xy_list = np.copy(temp_new_xy_list)
+    shrink_edge(temp_new_xy_list, new_xy_list, short_edge, r, theta, ratio)
+    shrink_edge(temp_new_xy_list, new_xy_list, short_edge + 2, r, theta, ratio)
+    return temp_new_xy_list, new_xy_list, long_edge
 
+def shrink_edge(xy_list, new_xy_list, edge, r, theta, ratio=cfg.shrink_ratio):
+    if ratio == 0.0:
+        return
+    start_point = edge
+    end_point = (edge + 1) % 4
+    long_start_sign_x = np.sign(
+        xy_list[end_point, 0] - xy_list[start_point, 0])
+    new_xy_list[start_point, 0] = \
+        xy_list[start_point, 0] + \
+        long_start_sign_x * ratio * r[start_point] * np.cos(theta[start_point])
+    long_start_sign_y = np.sign(
+        xy_list[end_point, 1] - xy_list[start_point, 1])
+    new_xy_list[start_point, 1] = \
+        xy_list[start_point, 1] + \
+        long_start_sign_y * ratio * r[start_point] * np.sin(theta[start_point])
+    # long edge one, end point
+    long_end_sign_x = -1 * long_start_sign_x
+    new_xy_list[end_point, 0] = \
+        xy_list[end_point, 0] + \
+        long_end_sign_x * ratio * r[end_point] * np.cos(theta[start_point])
+    long_end_sign_y = -1 * long_start_sign_y
+    new_xy_list[end_point, 1] = \
+        xy_list[end_point, 1] + \
+        long_end_sign_y * ratio * r[end_point] * np.sin(theta[start_point])
 
 def batch_reorder_vertexes(xy_list_array):
     reorder_xy_list_array = np.zeros_like(xy_list_array)
@@ -186,11 +234,13 @@ def preprocess():
                                    tuple(xy_list[vs[long_edge][q_th][4]])],
                                   width=3, fill='yellow')
             if cfg.gen_origin_img:
+                # im 是train image dir 里面的单个图片
                 im.save(os.path.join(train_image_dir, o_img_fname))
             np.save(os.path.join(
                 train_label_dir,
                 o_img_fname.replace('.jpg','.npy')),
                 xy_list_array)
+            #xy_list_array 是train label dir 里面的.npy
             if draw_gt_quad:
                 show_gt_im.save(os.path.join(show_gt_image_dir, o_img_fname))
             train_val_set.append('{},{},{}\n'.format(o_img_fname,
@@ -209,6 +259,43 @@ def preprocess():
         f_val.writelines(train_val_set[:val_count])
     with open(os.path.join(data_dir, cfg.train_fname), 'w') as f_train:
         f_train.writelines(train_val_set[val_count:])
+
+def preprocess_single_image(o_img_fname):
+    data_dir = cfg.data_dir
+    origin_image_dir = os.path.join(data_dir, cfg.origin_image_dir_name)
+    origin_txt_dir = os.path.join(data_dir, cfg.origin_txt_dir_name)
+    with Image.open(os.path.join(origin_image_dir, o_img_fname)) as im:
+        # d_wight, d_height = resize_image(im)
+        # 把原始图片要修改的size
+        d_wight, d_height = cfg.max_train_img_size, cfg.max_train_img_size
+        # 比例
+        scale_ratio_w = d_wight / im.width
+        scale_ratio_h = d_height / im.height
+        # resize
+        im = im.resize((d_wight, d_height), Image.ANTIALIAS)
+        with open(os.path.join(origin_txt_dir,
+                               o_img_fname.replace('.jpg', '.txt')), 'r', encoding='utf-8') as f:
+            # 每一张图对应的8个坐标位置以及文本
+            anno_list = f.readlines()
+        # 每一张图片对应有n个，4*2的数组，4个坐标，x,y
+        xy_list_array = np.zeros((len(anno_list), 4, 2))
+        for anno, i in zip(anno_list, range(len(anno_list))):
+            # list的前8个是坐标，最后一个是文本
+            anno_colums = anno.strip('\n').split(',')
+            anno_array = np.array(anno_colums)
+            # 8个坐标，变成4*2
+            xy_list = np.reshape(anno_array[:8].astype(float), (4, 2))
+            # x变幻，缩放
+            xy_list[:, 0] = xy_list[:, 0] * scale_ratio_w
+            # y变幻，缩放
+            xy_list[:, 1] = xy_list[:, 1] * scale_ratio_h
+            xy_list = reorder_vertexes(xy_list)
+            xy_list_array[i] = xy_list
+            _, shrink_xy_list, _ = shrink(xy_list, cfg.shrink_ratio)
+            shrink_1, _, long_edge = shrink(xy_list, cfg.shrink_side_ratio)
+        return im,xy_list_array
+
+
 
 
 if __name__ == '__main__':

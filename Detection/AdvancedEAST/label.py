@@ -3,7 +3,7 @@ import os
 from PIL import Image, ImageDraw
 from tqdm import tqdm
 from Detection.AdvancedEAST import cfg
-
+from Detection.AdvancedEAST.preprocess import preprocess_single_image
 
 def point_inside_of_quad(px, py, quad_xy_list, p_min, p_max):
     if (p_min[0] <= px <= p_max[0]) and (p_min[1] <= py <= p_max[1]):
@@ -169,6 +169,49 @@ def process_label(data_dir=cfg.data_dir):
         np.save(os.path.join(train_label_dir,
                              img_name.replace('.jpg', '_gt.npy')), gt)
 
+def process_label_single_image(img_name):
+    width,height=cfg.max_train_img_size,cfg.max_train_img_size
+    gt = np.zeros((height // cfg.pixel_size, width // cfg.pixel_size, 7))
+    resized_img,xy_list_array=preprocess_single_image(img_name)
+    for xy_list in xy_list_array:
+        _, shrink_xy_list, _ = shrink(xy_list, cfg.shrink_ratio)
+        shrink_1, _, long_edge = shrink(xy_list, cfg.shrink_side_ratio)
+        p_min = np.amin(shrink_xy_list, axis=0)
+        p_max = np.amax(shrink_xy_list, axis=0)
+        # floor of the float
+        ji_min = (p_min / cfg.pixel_size - 0.5).astype(int) - 1
+        # +1 for ceil of the float and +1 for include the end
+        ji_max = (p_max / cfg.pixel_size - 0.5).astype(int) + 3
+        imin = np.maximum(0, ji_min[1])
+        imax = np.minimum(height // cfg.pixel_size, ji_max[1])
+        jmin = np.maximum(0, ji_min[0])
+        jmax = np.minimum(width // cfg.pixel_size, ji_max[0])
+        for i in range(imin, imax):
+            for j in range(jmin, jmax):
+                px = (j + 0.5) * cfg.pixel_size
+                py = (i + 0.5) * cfg.pixel_size
+                if point_inside_of_quad(px, py,
+                                        shrink_xy_list, p_min, p_max):
+                    gt[i, j, 0] = 1
+                    line_width, line_color = 1, 'red'
+                    ith = point_inside_of_nth_quad(px, py,
+                                                   xy_list,
+                                                   shrink_1,
+                                                   long_edge)
+                    vs = [[[3, 0], [1, 2]], [[0, 1], [2, 3]]]
+                    if ith in range(2):
+                        gt[i, j, 1] = 1
+                        if ith == 0:
+                            line_width, line_color = 2, 'yellow'
+                        else:
+                            line_width, line_color = 2, 'green'
+                        gt[i, j, 2:3] = ith
+                        gt[i, j, 3:5] = \
+                            xy_list[vs[long_edge][ith][0]] - [px, py]
+                        gt[i, j, 5:] = \
+                            xy_list[vs[long_edge][ith][1]] - [px, py]
+
+    return resized_img,gt
 
 if __name__ == '__main__':
     process_label()

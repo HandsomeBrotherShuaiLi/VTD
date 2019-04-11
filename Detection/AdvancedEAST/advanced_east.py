@@ -18,7 +18,7 @@ if cfg.load_weights:
 TB=TensorBoard(log_dir='logs')
 RL=ReduceLROnPlateau(monitor='val_loss', factor=0.1, patience=3, min_lr=0, verbose=1)
 ES=EarlyStopping(monitor='val_loss', min_delta=0.0001, patience=10, mode='min', verbose=1)
-CK=ModelCheckpoint(filepath=cfg.model_weights_path,save_best_only=True,save_weights_only=True,verbose=3)
+CK=ModelCheckpoint(filepath=cfg.model_weights_path,save_best_only=True,save_weights_only=True,verbose=1)
 his=east_network.fit_generator(generator=gen(),
                            steps_per_epoch=cfg.steps_per_epoch,
                            epochs=100,
