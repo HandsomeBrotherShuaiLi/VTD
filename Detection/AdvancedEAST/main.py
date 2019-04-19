@@ -129,7 +129,6 @@ class Detection:
                             F.write('\n'.join(f))
                     except Exception as e:
                         print(e)
-
 if __name__=='__main__':
     d = Detection(
         computer_id='nio',

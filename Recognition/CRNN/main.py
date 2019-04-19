@@ -124,8 +124,11 @@ class Recognition(object):
         if predict_model_version=='v1':
             model=model.crnn_v1(istraining=False,isGRU=False)
             model.load_weights(model_path)
-        else:
+        elif predict_model_version=='v2':
             model=model.crnn_v2(istraining=False,isGRU=False)
+            model.load_weights(model_path)
+        else:
+            model=model.crnn_v3(istraining=False,isGRU=False)
             model.load_weights(model_path)
         print('load model done')
         test_image_list=open('info/test.txt','r',encoding='utf-8').readlines()
@@ -139,7 +142,7 @@ class Recognition(object):
                 true_label=test_image[1:]
                 true_chinese=''.join([self.num2chinse[int(i)] for i in true_label])
                 img=Image.open(os.path.join(self.img_dir,image_name))
-                print('original size',img.size)
+                # print('original size',img.size)
 
                 # plt.figure(image_name+' original size map')
                 # plt.imshow(img)
@@ -186,7 +189,7 @@ class Recognition(object):
                     img = np.array(img)
                     img = (img / 255.0) * 2.0 - 1.0
                     image = np.array([img])
-                    print(image.shape)
+                    # print(image.shape)
                     out = model.predict(image)
                     pred=decode_label(out)
                     if pred==true_chinese:

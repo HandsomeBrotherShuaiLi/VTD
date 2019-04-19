@@ -1,5 +1,5 @@
 import argparse,os
-
+from Recognition.CRNN.model import CRNN
 import numpy as np
 from PIL import Image, ImageDraw
 from keras.preprocessing import image
@@ -31,6 +31,7 @@ def cut_text_line(geo, scale_ratio_w, scale_ratio_h, im_array, s,predict_img_dir
     sub_im = image.array_to_img(sub_im_arr, scale=False)
     # sub_im.save(img_path + '_subim%d.jpg' % s)
     sub_im.save(os.path.join(predict_img_dir,img_name.replace('.jpg','_subim{}.jpg'.format(s))))
+    return sub_im
 
 
 def predict(east_detect, img_path, pixel_threshold, quiet=True):
@@ -150,7 +151,6 @@ def predict_new(east_detect, img_name,img_path, pixel_threshold,predict_img_dir,
             scale_ratio_h = d_height / im.height
             im = im.resize((d_wight, d_height), Image.ANTIALIAS)
             # im 也resize了
-
             # draw = ImageDraw.Draw(im)
             # for i, j in zip(activation_pixels[0], activation_pixels[1]):
             #     px = (j + 0.5) * cfg.pixel_size
@@ -183,8 +183,9 @@ def predict_new(east_detect, img_name,img_path, pixel_threshold,predict_img_dir,
                                     tuple(rescaled_geo[3]),
                                     tuple(rescaled_geo[0])], width=2, fill='red')
                     if cfg.predict_cut_text_line:
-                        cut_text_line(geo, scale_ratio_w, scale_ratio_h, im_array,
+                        sub_im=cut_text_line(geo, scale_ratio_w, scale_ratio_h, im_array,
                                       s, predict_img_dir, img_name)
+                        # sub_im.show()
 
                     rescaled_geo_list = np.reshape(rescaled_geo, (8,)).tolist()
                     txt_item = ','.join(map(str, rescaled_geo_list))
@@ -192,6 +193,7 @@ def predict_new(east_detect, img_name,img_path, pixel_threshold,predict_img_dir,
                 elif not quiet:
                     print('quad invalid with vertex num less then 4.')
             quad_im.save(os.path.join(predict_img_dir, img_name.replace('.jpg', '_predict.jpg')))
+            quad_im.show()
             if cfg.predict_write2txt and len(txt_items) > 0:
                 with open(os.path.join(predict_geo_dir, img_name.replace('.jpg', '_geo.txt')), 'w',
                           encoding='utf-8') as f_txt:
@@ -199,9 +201,10 @@ def predict_new(east_detect, img_name,img_path, pixel_threshold,predict_img_dir,
 
         print(img_path + '  DONE!!!')
     except Exception as e:
-        print(e)
         print(img_path+' Failed')
         fail.append(img_path)
+    return fail
+
 
 
 
