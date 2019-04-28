@@ -23,7 +23,10 @@ class ran_block(object):
         alpha=Conv2D(int(self.shape[-1])//2,kernel_size=(1,1),padding='same',kernel_initializer='he_normal',name='alpha')(self.input_tensor)
         beta=Conv2D(int(self.shape[-1])//2,kernel_size=(1,1),padding='same',kernel_initializer='he_normal')(self.input_tensor)
         gamma=Conv2D(int(self.shape[-1])//2,kernel_size=(1,1),padding='same',kernel_initializer='he_normal')(self.input_tensor)
-        alpha_1=Lambda(self.reshape_)(alpha)
+        alpha_1=Lambda(self.reshape_,output_shape=(int(alpha.get_shape()[1])*int(alpha.get_shape()[2]),int(alpha.get_shape()[-1])))(alpha)
+        beta_1=Lambda(self.reshape_,output_shape=(int(beta.get_shape()[1])*int(beta.get_shape()[2]),int(beta.get_shape()[-1])))(beta)
+        
+
         print(alpha_1.get_shape())
 
 
