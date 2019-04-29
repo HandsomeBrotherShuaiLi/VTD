@@ -182,8 +182,7 @@ def process_label_no_cfg(data_dir,shape):
     for line, _ in zip(f_list, tqdm(range(len(f_list)))):
         line_cols = str(line).strip('\n').split(',')
         img_name, width, height = \
-            line_cols[0].strip(), int(line_cols[1].strip()), \
-            int(line_cols[2].strip())
+            line_cols[0].strip(), shape, shape
         gt = np.zeros((height // cfg.pixel_size, width // cfg.pixel_size, 7))
         train_label_dir = os.path.join(data_dir, cfg.train_label_dir_name)
         xy_list_array = np.load(os.path.join(train_label_dir,
@@ -247,7 +246,7 @@ def process_label_no_cfg(data_dir,shape):
         np.save(os.path.join(train_label_dir,
                              img_name.replace('.jpg', '_gt.npy')), gt)
         print(os.path.join(train_label_dir,
-                             img_name.replace('.jpg', '_gt.npy'))+' Done!')
+                             img_name.replace('.jpg', '_gt.npy'))+' Shape is{} Done!'.format(gt.shape))
 
 def process_label_single_image(img_name,shape):
     width,height=shape,shape
@@ -294,4 +293,4 @@ def process_label_single_image(img_name,shape):
     return resized_img,gt
 
 if __name__ == '__main__':
-    process_label()
+    process_label_no_cfg('E:\py_projects\data_new\data_new\data',256)

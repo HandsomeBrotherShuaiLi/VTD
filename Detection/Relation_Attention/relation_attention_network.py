@@ -188,10 +188,10 @@ def _convND(ip, rank, channels):
     return x
 
 
-class RAN:
+class RAFCN:
     def __init__(self):
         self.input_img = Input(name='input_img',
-                               shape=(512, 512, cfg.num_channels),
+                               shape=(None, None, cfg.num_channels),
                                dtype='float32')
         vgg16 = VGG16(input_tensor=self.input_img,
                       weights='imagenet',
@@ -252,6 +252,6 @@ class RAN:
         return Model(inputs=self.input_img, outputs=east_detect)
 
 if __name__ == '__main__':
-    ran=RAN()
+    ran=RAFCN()
     model=ran.ran_network()
     model.summary()

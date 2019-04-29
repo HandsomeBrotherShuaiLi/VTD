@@ -28,8 +28,8 @@ else:
     batch_size = 8
 steps_per_epoch = total_img * (1 - validation_split_ratio) // batch_size
 validation_steps = total_img * validation_split_ratio // batch_size
-csv_path='D:\py_projects\data_new\data_new\data\original_csv\concat_train.csv'
-data_dir = 'D:\py_projects\data_new\data_new\data'
+csv_path='E:\py_projects\data_new\data_new\data\original_csv\concat_train.csv'
+data_dir = 'E:\py_projects\data_new\data_new\data'
 origin_image_dir_name = 'train_img'
 origin_txt_dir_name = 'train_txt'
 train_image_dir_name = 'resized_images'

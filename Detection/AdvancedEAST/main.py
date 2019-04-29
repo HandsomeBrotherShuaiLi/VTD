@@ -3,7 +3,7 @@ from keras.optimizers import Adam,SGD,RMSprop
 from Detection.AdvancedEAST.label import process_label_single_image,process_label_no_cfg
 from Detection.AdvancedEAST import cfg
 from Detection.AdvancedEAST.network import East
-from Detection.Relation_Attention.relation_attention_network import RAN
+from Detection.Relation_Attention.relation_attention_network import RAFCN
 from Detection.AdvancedEAST.losses import quad_loss
 from Detection.AdvancedEAST.data_generator import gen,gen_plus
 import numpy as np,os
@@ -86,7 +86,7 @@ class Detection:
             network = model.east_network()
             network.summary()
         else:
-            model=RAN()
+            model=RAFCN()
             network=model.ran_network()
             network.summary()
         network.compile(loss=quad_loss, optimizer=Adam(lr=cfg.lr,decay=cfg.decay) if self.opt=='adam' else RMSprop(lr=cfg.lr,decay=cfg.decay))
