@@ -1,6 +1,6 @@
 import os
 
-train_task_id = 'SIZE256'
+train_task_id = 'SIZE384'
 initial_epoch = 0
 epoch_num = 24
 lr = 1e-3
@@ -21,26 +21,26 @@ assert max_train_img_size in [256, 384, 512, 640, 736], \
 if max_train_img_size == 256:
     batch_size = 8
 elif max_train_img_size == 384:
-    batch_size = 4
+    batch_size = 8
 elif max_train_img_size == 512:
-    batch_size = 2
+    batch_size = 8
 else:
-    batch_size = 1
+    batch_size = 8
 steps_per_epoch = total_img * (1 - validation_split_ratio) // batch_size
 validation_steps = total_img * validation_split_ratio // batch_size
 csv_path='D:\py_projects\data_new\data_new\data\original_csv\concat_train.csv'
 data_dir = 'D:\py_projects\data_new\data_new\data'
 origin_image_dir_name = 'train_img'
 origin_txt_dir_name = 'train_txt'
-train_image_dir_name = 'resized_images_%s' % train_task_id
-train_label_dir_name = 'resized_images_labels_%s' % train_task_id
-show_gt_image_dir_name = 'show_gt_images_%s' % train_task_id
-show_act_image_dir_name = 'show_act_images_%s' % train_task_id
+train_image_dir_name = 'resized_images'
+train_label_dir_name = 'resized_images_labels'
+show_gt_image_dir_name = 'show_gt_images'
+show_act_image_dir_name = 'show_act_images'
 gen_origin_img = True
 draw_gt_quad = False
 draw_act_quad = False
-val_fname = 'val_%s.txt' % train_task_id
-train_fname = 'train_%s.txt' % train_task_id
+val_fname = 'val_SIZE256.txt'
+train_fname = 'train_SIZE256.txt'
 # in paper it's 0.3, maybe to large to this problem
 shrink_ratio = 0.2
 # pixels between 0.2 and 0.6 are side pixels

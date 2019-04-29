@@ -38,8 +38,8 @@ def gen(batch_size=cfg.batch_size, is_val=False):
             y[i] = np.load(gt_file)
         yield x, y
 
-def gen_plus(batch_size=cfg.batch_size, is_val=False):
-    img_h, img_w = cfg.max_train_img_size, cfg.max_train_img_size
+def gen_plus(shape,batch_size=cfg.batch_size, is_val=False):
+    img_h, img_w = shape,shape
     x = np.zeros((batch_size, img_h, img_w, cfg.num_channels), dtype=np.float32)
     pixel_num_h = img_h // cfg.pixel_size
     pixel_num_w = img_w // cfg.pixel_size
@@ -69,6 +69,7 @@ def gen_plus(batch_size=cfg.batch_size, is_val=False):
             y[count] = np.load(gt_file)
             count+=1
             if count>=batch_size:
+                print(x.shape,y.shape)
                 yield x,y
                 count=0
         np.random.shuffle(f_list)
