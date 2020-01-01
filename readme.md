@@ -16,7 +16,17 @@ First of all, the `data` package is a preprocess lib to resize or extract the te
 <div align=center><img src="info/figure1.png"/></div>
 <div align=center><img src="info/predict_img_26.jpg"/></div>
 <div align=center><img src="info/predict_img_27.jpg"/></div>
+<div align=center><img src="info/9.png"/></div>
 
+## Comparison
+To verify the effectiveness of our proposed framework,
+we did a series of comparative experiments on the ICDAR2013, ICDAR2015 and ICDAR2017 data sets. These
+experiments mainly focus on evaluating two essential methods in our model: Channel Attention Block, and Spatial
+Attention Block. All the experiments are based on single model and single-scale, the scales of testing images are set
+as 720 for three benchmark datasets.
+<div align=center><img src="info/1.png"/></div>
+<div align=center><img src="info/5.png"/></div>
+<div align=center><img src="info/8.png"/></div>
 ## Author
 * **Shuai Li (李帅)** - *all work*
 
